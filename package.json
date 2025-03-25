@@ -1,0 +1,35 @@
+{
+  "name": "create-esyt",
+  "version": "2.5.5",
+  "description": "A tool to create a new esyt project with your preferred stack",
+  "main": "cli.js",
+  "bin": {
+    "esyt": "./cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "esyt",
+    "create-app",
+    "vite",
+    "tailwindcss",
+    "framer-motion",
+    "clerk",
+    "prisma"
+  ],
+  "author": "Eshayat Al-Wasiu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ESHAYAT102/esyt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ESHAYAT102/esyt/issues"
+  },
+  "homepage": "https://esyt.eshayat.com",
+  "dependencies": {
+    "inquirer": "^12.5.0"
+  },
+  "type": "module"
+}
