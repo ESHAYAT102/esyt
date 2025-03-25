@@ -90,16 +90,14 @@ async function run() {
     if (!fs.existsSync(tailwindConfigPath)) {
       fs.writeFileSync(
         tailwindConfigPath,
-        `
-/** @type {import('tailwindcss').Config} */
+        `/** @type {import('tailwindcss').Config} */
 module.exports = {
 content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 theme: {
   extend: {},
 },
 plugins: [],
-};
-      `
+};`
       );
       console.log("Created tailwind.config.js file.");
     } else {
@@ -111,15 +109,13 @@ plugins: [],
     if (!fs.existsSync(viteConfigPath)) {
       fs.writeFileSync(
         viteConfigPath,
-        `
-import { defineConfig } from "vite";
+        `import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "tailwindcss";    
     
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-});        
-      `
+});`
       );
       console.log("Created vite.config.js file.");
     } else {
@@ -171,15 +167,13 @@ export default defineConfig({
   if (fs.existsSync(appJsxPath)) {
     fs.writeFileSync(
       appJsxPath,
-      `
-export default function App() {
+      `export default function App() {
   return (
     <>
       <h1>Hello</h1>
     </>
   );
-}
-      `
+}`
     );
     console.log("Updated App component with clean template.");
   }
@@ -189,8 +183,7 @@ export default function App() {
   if (fs.existsSync(indexHtmlPath)) {
     fs.writeFileSync(
       indexHtmlPath,
-      `
-<!DOCTYPE html>
+      `<!DOCTYPE html>
   <html lang="en">
     <head>
       <meta charset="UTF-8" />
@@ -204,8 +197,7 @@ export default function App() {
           projectInfo.language === "JavaScript" ? "jsx" : "tsx"
         }"></script>
     </body>
-  </html>
-      `
+  </html>`
     );
     console.log("Updated index.html with clean template.");
   }
