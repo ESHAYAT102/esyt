@@ -114,7 +114,8 @@ plugins: [],
         `
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "tailwindcss";        
+import tailwindcss from "tailwindcss";    
+    
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 });        
@@ -199,9 +200,9 @@ export default function App() {
     </head>
     <body>
       <div id="root"></div>
-            <script type="module" src="/src/main.${
-              projectInfo.language === "JavaScript" ? "jsx" : "tsx"
-            }"></script>
+        <script type="module" src="/src/main.${
+          projectInfo.language === "JavaScript" ? "jsx" : "tsx"
+        }"></script>
     </body>
   </html>
       `
