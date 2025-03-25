@@ -97,7 +97,8 @@ theme: {
   extend: {},
 },
 plugins: [],
-};`
+};
+`
       );
       console.log("Created tailwind.config.js file.");
     } else {
@@ -115,7 +116,8 @@ import tailwindcss from "tailwindcss";
     
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-});`
+});
+`
       );
       console.log("Created vite.config.js file.");
     } else {
@@ -173,7 +175,8 @@ export default defineConfig({
       <h1>Hello</h1>
     </>
   );
-}`
+}
+`
     );
     console.log("Updated App component with clean template.");
   }
@@ -184,20 +187,21 @@ export default defineConfig({
     fs.writeFileSync(
       indexHtmlPath,
       `<!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="stylesheet" href="./src/index.css" />
-      <title>ESYT</title>
-    </head>
-    <body>
-      <div id="root"></div>
-        <script type="module" src="/src/main.${
-          projectInfo.language === "JavaScript" ? "jsx" : "tsx"
-        }"></script>
-    </body>
-  </html>`
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./src/index.css" />
+    <title>ESYT</title>
+  </head>
+  <body>
+    <div id="root"></div>
+      <script type="module" src="/src/main.${
+        projectInfo.language === "JavaScript" ? "jsx" : "tsx"
+      }"></script>
+  </body>
+</html>
+`
     );
     console.log("Updated index.html with clean template.");
   }
