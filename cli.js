@@ -83,13 +83,14 @@ async function run() {
   // Step 6: Install and configure selected packages
   if (projectInfo.packages.includes("TailwindCSS")) {
     console.log("Adding TailwindCSS...");
-    execSync("npm i -D tailwindcss postcss autoprefixer", { stdio: "inherit" });
-    execSync("npx tailwindcss init -p", { stdio: "inherit" });
+    execSync("npm install tailwindcss @tailwindcss/vite", { stdio: "inherit" });
 
     // Basic Tailwind CSS configuration
-    fs.writeFileSync(
-      path.join(projectPath, "tailwind.config.js"),
-      `
+    const tailwindConfigPath = path.join(projectPath, "tailwind.config.js");
+    if (!fs.existsSync(tailwindConfigPath)) {
+      fs.writeFileSync(
+        tailwindConfigPath,
+        `
       /** @type {import('tailwindcss').Config} */\n
       module.exports = {\n
       content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],\n
@@ -100,7 +101,32 @@ async function run() {
 };\n
 \n
       `
-    );
+      );
+      console.log("Created tailwind.config.js file.");
+    } else {
+      console.log("Using existing tailwind.config.js file.");
+    }
+
+    // Create vite.config.js file with TailwindCSS configuration
+    const viteConfigPath = path.join(projectPath, "vite.config.js");
+    if (!fs.existsSync(viteConfigPath)) {
+      fs.writeFileSync(
+        viteConfigPath,
+        `
+        import { defineConfig } from "vite";\n
+        import react from "@vitejs/plugin-react";\n
+        import tailwindcss from "tailwindcss";\n
+        \n
+        export default defineConfig({\n
+          plugins: [react(), tailwindcss()],\n
+        });\n
+        \n
+      `
+      );
+      console.log("Created vite.config.js file.");
+    } else {
+      console.log("Using existing vite.config.js file.");
+    }
 
     // Update src/index.css to include Tailwind directives
     const cssPath = path.join(projectPath, "src", "index.css");
