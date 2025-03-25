@@ -83,7 +83,7 @@ async function run() {
   // Step 6: Install and configure selected packages
   if (projectInfo.packages.includes("TailwindCSS")) {
     console.log("Adding TailwindCSS and PostCSS...");
-    execSync("npm install tailwindcss @tailwindcss/vite postcss autoprefixer", {
+    execSync("npm install tailwindcss @tailwindcss/postcss postcss", {
       stdio: "inherit",
     });
 
@@ -134,25 +134,7 @@ export default defineConfig({
       console.warn("Could not find src/index.css to add Tailwind directives.");
     }
 
-    // Create postcss.config.js file
-    const postcssConfigPath = path.join(projectPath, "postcss.config.js");
-    if (!fs.existsSync(postcssConfigPath)) {
-      fs.writeFileSync(
-        postcssConfigPath,
-        `module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-};
-`
-      );
-      console.log("Created postcss.config.js file.");
-    } else {
-      console.log("Using existing postcss.config.js file.");
-    }
-
-    console.log("TailwindCSS and PostCSS setup complete with clean template.");
+    console.log("TailwindCSS setup complete with clean template.");
   }
 
   // Delete unnecessary files
