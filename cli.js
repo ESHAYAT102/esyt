@@ -91,15 +91,14 @@ async function run() {
       fs.writeFileSync(
         tailwindConfigPath,
         `
-      /** @type {import('tailwindcss').Config} */\n
-      module.exports = {\n
-      content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],\n
-      theme: {\n
-        extend: {},\n
-      },\n
-      plugins: [],\n
-};\n
-\n
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+theme: {
+  extend: {},
+},
+plugins: [],
+};
       `
       );
       console.log("Created tailwind.config.js file.");
@@ -113,14 +112,12 @@ async function run() {
       fs.writeFileSync(
         viteConfigPath,
         `
-        import { defineConfig } from "vite";\n
-        import react from "@vitejs/plugin-react";\n
-        import tailwindcss from "tailwindcss";\n
-        \n
-        export default defineConfig({\n
-          plugins: [react(), tailwindcss()],\n
-        });\n
-        \n
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "tailwindcss";        
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});        
       `
       );
       console.log("Created vite.config.js file.");
@@ -174,14 +171,14 @@ async function run() {
     fs.writeFileSync(
       appJsxPath,
       `
-      export default function App() {\n
-        return (\n
-          <>\n
-            <h1>Hello</h1>\n
-          </>\n
-        );\n
-      }\n
-      \n`
+export default function App() {
+  return (
+    <>
+      <h1>Hello</h1>
+    </>
+  );
+}
+      `
     );
     console.log("Updated App component with clean template.");
   }
@@ -192,21 +189,21 @@ async function run() {
     fs.writeFileSync(
       indexHtmlPath,
       `
-      <!DOCTYPE html>\n
-        <html lang="en">\n
-          <head>\n
-            <meta charset="UTF-8" />\n
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n
-            <link rel="stylesheet" href="./src/index.css" />\n
-            <title>ESYT</title>\n
-          </head>\n
-          <body>\n
-            <div id="root"></div>\n
+<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href="./src/index.css" />
+      <title>ESYT</title>
+    </head>
+    <body>
+      <div id="root"></div>
             <script type="module" src="/src/main.${
               projectInfo.language === "JavaScript" ? "jsx" : "tsx"
-            }"></script>\n
-          </body>\n
-        </html>\n
+            }"></script>
+    </body>
+  </html>
       `
     );
     console.log("Updated index.html with clean template.");
