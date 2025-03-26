@@ -253,12 +253,13 @@ export default defineConfig({
     );
   }
 
-  // Install OGL library
-  console.log("Adding OGL (WebGL Framework)...");
-  execSync("npm i ogl", { stdio: "inherit" });
-  console.log(
-    "OGL installed. Please refer to the OGL documentation for usage instructions."
-  );
+  if (projectInfo.packages.includes("OGL")) {
+    console.log("Adding OGL (WebGL Framework)...");
+    execSync("npm i ogl", { stdio: "inherit" });
+    console.log(
+      "OGL installed. Please refer to the OGL documentation for usage instructions."
+    );
+  }
 
   // Step 7: Initialize Git repository
   if (projectInfo.gitInit) {
