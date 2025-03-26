@@ -48,19 +48,14 @@ Just run one of the installation commands above and follow the interactive promp
 
 ```bash
 $ npm create esyt
+ ? What will your project be called? esyt-app
+ ? Will you be using JavaScript or TypeScript? JavaScript
+ ? Which packages would you like to enable? Framer Motion, OGL
+ ? Initialize a new git repository? No
+ ? Would you like us to run 'npm i'? Yes
+ ? Would you like to run the development server automatically after setup? No
 
-    ESYT CLI
-
-? What will your project be called? my-awesome-app
-? Will you be using JavaScript or TypeScript? TypeScript
-? Which packages would you like to enable? Framer Motion, OGL, Clerk, Appwrite, Prisma
-? Initialize a new git repository? Yes
-? Would you like us to run npm install? Yes
-? Would you like to run the development server automatically after setup? Yes
-
-Good choice! Using TypeScript!
-Running: npm create vite@latest
-...
+ Good choice! Using JavaScript!
 ```
 
 ## What's Included
