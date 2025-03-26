@@ -89,8 +89,8 @@ async function run() {
 
   // Step 6: Install and configure selected packages
   if (projectInfo.packages.includes("TailwindCSS")) {
-    console.log("Adding TailwindCSS and PostCSS...");
-    execSync("npm install tailwindcss @tailwindcss/postcss postcss", {
+    console.log("Adding TailwindCSS...");
+    execSync("npm install tailwindcss @tailwindcss/vite", {
       stdio: "inherit",
     });
 
@@ -100,7 +100,7 @@ async function run() {
       fs.writeFileSync(
         tailwindConfigPath,
         `/** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
 content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 theme: {
   extend: {},
