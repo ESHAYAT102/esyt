@@ -31,7 +31,14 @@ async function run() {
       type: "checkbox",
       name: "packages",
       message: "Which packages would you like to enable?",
-      choices: ["TailwindCSS", "Framer Motion", "Clerk", "Appwrite", "Prisma"],
+      choices: [
+        "TailwindCSS",
+        "Framer Motion",
+        "OGL",
+        "Clerk",
+        "Appwrite",
+        "Prisma",
+      ],
       default: ["TailwindCSS"],
     },
     {
@@ -245,6 +252,13 @@ export default defineConfig({
       "Framer Motion installed. Please refer to the Framer Motion documentation for usage instructions."
     );
   }
+
+  // Install OGL library
+  console.log("Adding OGL (WebGL Framework)...");
+  execSync("npm i ogl", { stdio: "inherit" });
+  console.log(
+    "OGL installed. Please refer to the OGL documentation for usage instructions."
+  );
 
   // Step 7: Initialize Git repository
   if (projectInfo.gitInit) {

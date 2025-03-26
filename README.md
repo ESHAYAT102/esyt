@@ -27,6 +27,7 @@ bun create esyt
 - 🔄 **JavaScript or TypeScript** - Choose your preferred language
 - 🎨 **TailwindCSS** - Utility-first CSS framework for rapid UI development
 - 🎭 **Framer Motion** - Production-ready animation library for React
+- 🌐 **OGL** - Minimal WebGL framework for creative coding projects
 - 🔒 **Clerk** - Complete user management solution
 - ☁️ **Appwrite** - Open source backend server for web and mobile apps
 - 💾 **Prisma** - Next-generation ORM for Node.js and TypeScript
@@ -41,7 +42,7 @@ Just run one of the installation commands above and follow the interactive promp
 
 1. **Project Name**: Enter a name for your project (default: "esyt-app")
 2. **Language**: Choose between JavaScript or TypeScript
-3. **Packages**: Select from TailwindCSS, Framer Motion, Clerk, Appwrite, and Prisma
+3. **Packages**: Select from TailwindCSS, Framer Motion, OGL, Clerk, Appwrite, and Prisma
 4. **Git**: Choose whether to initialize a Git repository
 5. **Dependencies**: Choose whether to automatically install dependencies
 6. **Dev Server**: Choose whether to run the development server automatically after setup
@@ -55,7 +56,7 @@ $ npm create esyt
 
 ? What will your project be called? my-awesome-app
 ? Will you be using JavaScript or TypeScript? TypeScript
-? Which packages would you like to enable? TailwindCSS, Framer Motion, Clerk, Appwrite, Prisma
+? Which packages would you like to enable? TailwindCSS, Framer Motion, OGL, Clerk, Appwrite, Prisma
 ? Initialize a new git repository? Yes
 ? Would you like us to run npm install? Yes
 ? Would you like to run the development server automatically after setup? Yes
@@ -72,6 +73,7 @@ Depending on your selections, your project will be set up with:
 - A Vite-powered React project with JavaScript or TypeScript
 - TailwindCSS configuration and directives
 - Framer Motion animation library
+- OGL WebGL framework for 3D graphics
 - Clerk authentication setup
 - Appwrite backend integration
 - Prisma ORM with PostgreSQL configuration
