@@ -85,6 +85,7 @@ async function run() {
       }
 
       // Step 6: Install and configure selected packages
+      // Only install additional packages if dependencies installation was requested
     } catch (error) {
       console.error("Error during initial setup:", error.message);
     }
@@ -160,19 +161,6 @@ async function run() {
         }
       } else {
         console.warn(`App component file not found at ${appJsxPath}`);
-      }
-
-      // Clear index.css file
-      const indexCssPath = path.join(projectPath, "src", "index.css");
-      if (fs.existsSync(indexCssPath)) {
-        try {
-          fs.writeFileSync(indexCssPath, "");
-          console.log("Cleared index.css file.");
-        } catch (error) {
-          console.error(`Failed to clear index.css file: ${error.message}`);
-        }
-      } else {
-        console.warn(`index.css file not found at ${indexCssPath}`);
       }
 
       // Update index.html with clean template
@@ -275,6 +263,49 @@ async function run() {
           } catch (error) {
             console.error(`❌ Failed to install OGL: ${error.message}`);
           }
+        }
+
+        // Install and configure Tailwind CSS
+        console.log("\nAdding Tailwind CSS...");
+        try {
+          execSync("npm install tailwindcss @tailwindcss/vite", {
+            stdio: "inherit",
+          });
+
+          // Update index.css with Tailwind directives
+          const indexCssPath = path.join(projectPath, "src", "index.css");
+          if (fs.existsSync(indexCssPath)) {
+            fs.writeFileSync(indexCssPath, `@import "tailwindcss";`);
+            console.log("✅ Updated index.css with Tailwind directives.");
+            console.log(
+              "Make sure to modify the 'vite.config.js' file manually for TailwindCSS."
+            );
+          } else {
+            console.warn(`index.css not found at ${indexCssPath}`);
+          }
+
+          // Update tailwind.config.js to include content paths
+          const tailwindConfigPath = path.join(
+            projectPath,
+            "tailwind.config.js"
+          );
+          if (fs.existsSync(tailwindConfigPath)) {
+            fs.writeFileSync(
+              tailwindConfigPath,
+              `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [require('@tailwindcss/forms')],\n}\n`
+            );
+            console.log(
+              "✅ Updated tailwind.config.js with proper configuration."
+            );
+          } else {
+            console.warn(
+              `tailwind.config.js not found at ${tailwindConfigPath}`
+            );
+          }
+
+          console.log("✅ Tailwind CSS installed and configured.");
+        } catch (error) {
+          console.error(`❌ Failed to install Tailwind CSS: ${error.message}`);
         }
       } catch (error) {
         console.error("Error installing packages:", error.message);
