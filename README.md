@@ -17,8 +17,6 @@ npm create esyt@latest
 # Using pnpm
 pnpm create esyt
 
-# Using bun
-bun create esyt
 ```
 
 ## Features
