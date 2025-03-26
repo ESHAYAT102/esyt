@@ -32,15 +32,8 @@ async function run() {
         type: "checkbox",
         name: "packages",
         message: "Which packages would you like to enable?",
-        choices: [
-          "TailwindCSS",
-          "Framer Motion",
-          "OGL",
-          "Clerk",
-          "Appwrite",
-          "Prisma",
-        ],
-        default: ["TailwindCSS"],
+        choices: ["Framer Motion", "OGL", "Clerk", "Appwrite", "Prisma"],
+        default: [],
       },
       {
         type: "confirm",
@@ -93,76 +86,6 @@ async function run() {
 
       // Step 6: Install and configure selected packages
       // Only install additional packages if dependencies installation was requested
-      if (
-        projectInfo.installDeps &&
-        projectInfo.packages.includes("TailwindCSS")
-      ) {
-        console.log("Adding TailwindCSS...");
-        execSync("npm install tailwindcss @tailwindcss/vite", {
-          stdio: "inherit",
-        });
-        execSync("npx tailwindcss init", { stdio: "inherit" });
-
-        // Basic Tailwind CSS configuration
-        try {
-          // TailwindCSS init already created the config file, but we'll ensure it has the right content
-          const tailwindConfigPath = path.join(
-            projectPath,
-            "tailwind.config.js"
-          );
-          if (fs.existsSync(tailwindConfigPath)) {
-            console.log("Using existing tailwind.config.js file.");
-          } else {
-            console.warn("tailwind.config.js not found. Creating it manually.");
-            fs.writeFileSync(
-              tailwindConfigPath,
-              `/** @type {import('tailwindcss').Config} */
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-`
-            );
-            console.log("Created tailwind.config.js file.");
-          }
-
-          // Update vite.config.js file if needed
-          const viteConfigPath = path.join(projectPath, "vite.config.js");
-          if (fs.existsSync(viteConfigPath)) {
-            console.log("Using existing vite.config.js file.");
-          } else {
-            fs.writeFileSync(
-              viteConfigPath,
-              `import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
-export default defineConfig({
-  plugins: [react()],
-});
-`
-            );
-            console.log("Created vite.config.js file.");
-          }
-
-          // Update src/index.css to include Tailwind directives
-          const cssPath = path.join(projectPath, "src", "index.css");
-          if (fs.existsSync(cssPath)) {
-            fs.writeFileSync(cssPath, `@import "tailwindcss";`);
-            console.log("Updated index.css with Tailwind directives.");
-          } else {
-            console.warn(
-              "Could not find src/index.css to add Tailwind directives."
-            );
-          }
-
-          console.log("TailwindCSS setup complete with clean template.");
-        } catch (error) {
-          console.error("Error setting up TailwindCSS:", error.message);
-        }
-      }
     } catch (error) {
       console.error("Error during initial setup:", error.message);
     }
@@ -225,12 +148,9 @@ export default defineConfig({
             appJsxPath,
             `export default function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to Your ESYT App</h1>
-        <p className="text-gray-600">Start building something amazing!</p>
-      </div>
-    </div>
+    <>
+      <h1>ESYT</h1>
+    </>
   );
 }
 `

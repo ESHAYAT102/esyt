@@ -1,6 +1,6 @@
 {
   "name": "create-esyt",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "A tool to create a new esyt project with your preferred stack",
   "main": "cli.js",
   "bin": {
@@ -13,7 +13,6 @@
     "esyt",
     "create-app",
     "vite",
-    "tailwindcss",
     "framer-motion",
     "ogl",
     "clerk",
