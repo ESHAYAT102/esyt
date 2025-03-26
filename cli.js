@@ -101,7 +101,7 @@ async function run() {
         execSync("npm install tailwindcss @tailwindcss/vite", {
           stdio: "inherit",
         });
-        execSync("", { stdio: "inherit" });
+        execSync("npx tailwindcss init", { stdio: "inherit" });
 
         // Basic Tailwind CSS configuration
         try {
