@@ -85,7 +85,6 @@ async function run() {
       }
 
       // Step 6: Install and configure selected packages
-      // Only install additional packages if dependencies installation was requested
     } catch (error) {
       console.error("Error during initial setup:", error.message);
     }
@@ -161,6 +160,19 @@ async function run() {
         }
       } else {
         console.warn(`App component file not found at ${appJsxPath}`);
+      }
+
+      // Clear index.css file
+      const indexCssPath = path.join(projectPath, "src", "index.css");
+      if (fs.existsSync(indexCssPath)) {
+        try {
+          fs.writeFileSync(indexCssPath, "");
+          console.log("Cleared index.css file.");
+        } catch (error) {
+          console.error(`Failed to clear index.css file: ${error.message}`);
+        }
+      } else {
+        console.warn(`index.css file not found at ${indexCssPath}`);
       }
 
       // Update index.html with clean template

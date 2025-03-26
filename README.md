@@ -4,7 +4,7 @@ A modern CLI tool to quickly scaffold React projects with your preferred tech st
 
 ## Overview
 
-`esyt` is a command-line interface tool that helps you create new React projects with optional TypeScript support and popular packages like TailwindCSS, Framer Motion, Clerk, Appwrite, and Prisma. It's built on top of Vite for lightning-fast development experience.
+`esyt` is a command-line interface tool that helps you create new React projects with optional TypeScript support and popular packages like Framer Motion, Clerk, Appwrite, and Prisma. It's built on top of Vite for lightning-fast development experience.
 
 ## Installation
 
@@ -41,7 +41,7 @@ Just run one of the installation commands above and follow the interactive promp
 
 1. **Project Name**: Enter a name for your project (default: "esyt-app")
 2. **Language**: Choose between JavaScript or TypeScript
-3. **Packages**: Select from TailwindCSS, Framer Motion, OGL, Clerk, Appwrite, and Prisma
+3. **Packages**: Select from Framer Motion, OGL, Clerk, Appwrite, and Prisma
 4. **Git**: Choose whether to initialize a Git repository
 5. **Dependencies**: Choose whether to automatically install dependencies
 6. **Dev Server**: Choose whether to run the development server automatically after setup
