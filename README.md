@@ -23,6 +23,7 @@ pnpm create esyt
 
 - 🚀 **Vite-powered** - Blazing fast development server and optimized builds
 - 🔄 **JavaScript or TypeScript** - Choose your preferred language
+- 🎨 **TailwindCSS** - Utility-first CSS framework for rapid UI development
 - 🎭 **Framer Motion** - Production-ready animation library for React
 - 🌐 **OGL** - Minimal WebGL framework for creative coding projects
 - 🔒 **Clerk** - Complete user management solution
@@ -39,7 +40,7 @@ Just run one of the installation commands above and follow the interactive promp
 
 1. **Project Name**: Enter a name for your project (default: "esyt-app")
 2. **Language**: Choose between JavaScript or TypeScript
-3. **Packages**: Select from Framer Motion, OGL, Clerk, Appwrite, and Prisma
+3. **Packages**: Select from TailwindCSS, Framer Motion, OGL, Clerk, Appwrite, and Prisma
 4. **Git**: Choose whether to initialize a Git repository
 5. **Dependencies**: Choose whether to automatically install dependencies
 6. **Dev Server**: Choose whether to run the development server automatically after setup
@@ -50,7 +51,7 @@ Just run one of the installation commands above and follow the interactive promp
 $ npm create esyt
  ? What will your project be called? esyt-app
  ? Will you be using JavaScript or TypeScript? JavaScript
- ? Which packages would you like to enable? Framer Motion, OGL
+ ? Which packages would you like to enable? TailwindCSS, Framer Motion, OGL
  ? Initialize a new git repository? No
  ? Would you like us to run 'npm i'? Yes
  ? Would you like to run the development server automatically after setup? No
@@ -63,6 +64,7 @@ $ npm create esyt
 Depending on your selections, your project will be set up with:
 
 - A Vite-powered React project with JavaScript or TypeScript
+- TailwindCSS for styling
 - Framer Motion animation library
 - OGL WebGL framework for 3D graphics
 - Clerk authentication setup
