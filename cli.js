@@ -285,30 +285,49 @@ async function run() {
             if (fs.existsSync(indexCssPath)) {
               fs.writeFileSync(indexCssPath, `@import "tailwindcss";\n`);
               console.log("✅ Updated index.css with Tailwind directives.");
-              console.log(
-                "Make sure to modify the 'vite.config.js' file manually for TailwindCSS."
-              );
             } else {
               console.warn(`index.css not found at ${indexCssPath}`);
             }
 
-            // Update tailwind.config.js to include content paths
+            // Create tailwind.config.js in the project root
             const tailwindConfigPath = path.join(
               projectPath,
               "tailwind.config.js"
             );
-            if (fs.existsSync(tailwindConfigPath)) {
+            try {
+              // Check if the file exists first
+              if (!fs.existsSync(tailwindConfigPath)) {
+                // Create the file with proper configuration
+                fs.writeFileSync(
+                  tailwindConfigPath,
+                  `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`
+                );
+                console.log(
+                  "✅ Created tailwind.config.js with proper configuration."
+                );
+              } else {
+                console.log(
+                  "✅ tailwind.config.js already exists, skipping creation."
+                );
+              }
+            } catch (error) {
+              console.error(
+                `❌ Failed to create tailwind.config.js: ${error.message}`
+              );
+            }
+
+            // Update vite.config.js with TailwindCSS configuration
+            const viteConfigPath = path.join(projectPath, "vite.config.js");
+            if (fs.existsSync(viteConfigPath)) {
               fs.writeFileSync(
-                tailwindConfigPath,
-                `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [require('@tailwindcss/forms')],\n}\n`
+                viteConfigPath,
+                `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`
               );
               console.log(
-                "✅ Updated tailwind.config.js with proper configuration."
+                "✅ Updated vite.config.js with TailwindCSS configuration."
               );
             } else {
-              console.warn(
-                `tailwind.config.js not found at ${tailwindConfigPath}`
-              );
+              console.warn(`vite.config.js not found at ${viteConfigPath}`);
             }
 
             console.log("✅ Tailwind CSS installed and configured.");
