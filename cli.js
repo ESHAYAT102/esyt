@@ -54,14 +54,21 @@ async function run() {
         message: "Would you like us to run 'npm i'?",
         default: true,
       },
-      {
-        type: "confirm",
-        name: "runDevServer",
-        message:
-          "Would you like to run the development server automatically after setup?",
-        default: true,
-      },
     ]);
+
+    if (projectInfo.installDeps) {
+      const devServerPrompt = await inquirer.prompt([
+        {
+          type: "confirm",
+          name: "runDevServer",
+          message: "Would you like to run the development server automatically after setup?",
+          default: true,
+        },
+      ]);
+      projectInfo.runDevServer = devServerPrompt.runDevServer;
+    } else {
+      projectInfo.runDevServer = false;
+    }
 
     console.log(`Good choice! Using ${projectInfo.language}!`);
 
