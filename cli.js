@@ -274,6 +274,40 @@ async function run() {
           try {
             execSync("npm i react-router-dom", { stdio: "inherit" });
             console.log("✅ React Router installed.");
+            
+            // Update main entry file with React Router configuration
+            const mainFilePath = path.join(
+              projectPath,
+              "src",
+              `main.${projectInfo.language === "JavaScript" ? "jsx" : "tsx"}`
+            );
+            if (fs.existsSync(mainFilePath)) {
+              fs.writeFileSync(
+                mainFilePath,
+                `import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App${projectInfo.language === "JavaScript" ? ".jsx" : ".tsx"}";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: App,
+  },
+]);
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <RouterProvider router={router}></RouterProvider>
+  </StrictMode>
+);
+`
+              );
+              console.log("✅ Updated main entry file with React Router configuration.");
+            } else {
+              console.warn(`Main entry file not found at ${mainFilePath}`);
+            }
           } catch (error) {
             console.error(`❌ Failed to install React Router: ${error.message}`);
           }
