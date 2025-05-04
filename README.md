@@ -8,7 +8,7 @@ A modern CLI tool to quickly scaffold React projects with your preferred tech st
 
 ## Installation
 
-You can use `esyt` with any of these package managers without installing it globally:
+You can use `esyt` with any of these package managers:
 
 ```bash
 # Using npm
@@ -54,7 +54,7 @@ Just run one of the installation commands above and follow the interactive promp
 $ npm create esyt
  ? What will your project be called? esyt-app
  ? Will you be using JavaScript or TypeScript? JavaScript
- ? Which packages would you like to enable? TailwindCSS, React Router, Framer Motion
+ ? Which packages would you like to enable? TailwindCSS, React Router, Firebase
  ? Initialize a new git repository? Yes
  ? Would you like us to run 'npm i'? Yes
  ? Would you like to run the development server automatically after setup? Yes

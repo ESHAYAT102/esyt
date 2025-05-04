@@ -34,6 +34,7 @@ async function run() {
           "React Router",
           "Framer Motion",
           "OGL",
+          "Firebase",
           "Clerk",
           "Appwrite",
           "Prisma",
@@ -316,6 +317,16 @@ createRoot(document.getElementById("root")).render(
             console.log("✅ OGL installed.");
           } catch (error) {
             console.error(`❌ Failed to install OGL: ${error.message}`);
+          }
+        }
+
+        if (projectInfo.packages.includes("Firebase")) {
+          console.log("\nAdding Firebase...");
+          try {
+            execSync("npm i firebase", { stdio: "inherit" });
+            console.log("✅ Firebase installed.");
+          } catch (error) {
+            console.error(`❌ Failed to install Firebase: ${error.message}`);
           }
         }
 
