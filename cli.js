@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
@@ -333,7 +334,7 @@ createRoot(document.getElementById("root")).render(
         if (projectInfo.packages.includes("MongoDB")) {
           console.log("\nAdding MongoDB...");
           try {
-            execSync("npm install mongodb@latest", { stdio: "inherit" });
+            execSync("npm i mongodb", { stdio: "inherit" });
             console.log("✅ MongoDB installed.");
           } catch (error) {
             console.error(`❌ Failed to install MongoDB: ${error.message}`);
