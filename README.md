@@ -32,6 +32,8 @@ pnpm create esyt
 - 🔒 **Clerk** - Complete user management solution
 - ☁️ **Appwrite** - Open source backend server for web and mobile apps
 - 💾 **Prisma** - Next-generation ORM for Node.js and TypeScript
+- 🔑 **DotENV** - Zero-dependency module for loading environment variables
+- 🌐 **Axios** - Promise-based HTTP client for the browser and node.js
 - 🧩 **Customizable** - Select only the packages you need
 - 📦 **Dependency Installation** - Option to automatically install dependencies
 - 🔄 **Git Integration** - Option to initialize a Git repository
@@ -79,6 +81,8 @@ Depending on your selections, your project will be set up with:
 - Clerk authentication setup
 - Appwrite backend integration
 - Prisma ORM with PostgreSQL configuration
+- DotENV for environment variable management
+- Axios for making HTTP requests
 - Automatic project opening in your preferred IDE (VSCode, Cursor, or Trae)
 
 ## After Installation

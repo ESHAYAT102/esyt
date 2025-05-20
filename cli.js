@@ -34,6 +34,8 @@ async function run() {
           "React Router",
           "Framer Motion",
           "OGL",
+          "DotENV",
+          "Axios",
           "MongoDB",
           "Firebase",
           "Clerk",
@@ -338,6 +340,26 @@ createRoot(document.getElementById("root")).render(
             console.log("✅ MongoDB installed.");
           } catch (error) {
             console.error(`❌ Failed to install MongoDB: ${error.message}`);
+          }
+        }
+
+        if (projectInfo.packages.includes("DotENV")) {
+          console.log("\nAdding DotENV...");
+          try {
+            execSync("npm i dotenv", { stdio: "inherit" });
+            console.log("✅ DotENV installed.");
+          } catch (error) {
+            console.error(`❌ Failed to install DotENV: ${error.message}`);
+          }
+        }
+
+        if (projectInfo.packages.includes("Axios")) {
+          console.log("\nAdding Axios...");
+          try {
+            execSync("npm i axios", { stdio: "inherit" });
+            console.log("✅ Axios installed.");
+          } catch (error) {
+            console.error(`❌ Failed to install Axios: ${error.message}`);
           }
         }
 
