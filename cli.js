@@ -36,7 +36,6 @@ async function run() {
           "OGL",
           "DotENV",
           "Axios",
-          "MongoDB",
           "Firebase",
           "Clerk",
           "Appwrite",
@@ -330,16 +329,6 @@ createRoot(document.getElementById("root")).render(
             console.log("✅ Firebase installed.");
           } catch (error) {
             console.error(`❌ Failed to install Firebase: ${error.message}`);
-          }
-        }
-
-        if (projectInfo.packages.includes("MongoDB")) {
-          console.log("\nAdding MongoDB...");
-          try {
-            execSync("npm i mongodb", { stdio: "inherit" });
-            console.log("✅ MongoDB installed.");
-          } catch (error) {
-            console.error(`❌ Failed to install MongoDB: ${error.message}`);
           }
         }
 
