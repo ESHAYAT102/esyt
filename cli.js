@@ -149,6 +149,51 @@ async function run() {
       console.error("Error during cleanup:", error.message);
     }
 
+    console.log("\nCreating components folder and files...");
+    try {
+      const componentsDir = path.join(projectPath, "src", "components");
+      if (!fs.existsSync(componentsDir)) {
+        fs.mkdirSync(componentsDir);
+        console.log("Created components directory.");
+      }
+
+      // Create Navbar component
+      const navbarPath = path.join(
+        componentsDir,
+        `Navbar.${projectInfo.language === "JavaScript" ? "jsx" : "tsx"}`
+      );
+      fs.writeFileSync(
+        navbarPath,
+        `export default function Navbar() {
+    return (
+      <>
+        <h1>Navbar</h1>
+      </>
+    )
+}`
+      );
+      console.log("Created Navbar component.");
+
+      // Create Footer component
+      const footerPath = path.join(
+        componentsDir,
+        `Footer.${projectInfo.language === "JavaScript" ? "jsx" : "tsx"}`
+      );
+      fs.writeFileSync(
+        footerPath,
+        `export default function Footer() {
+    return (
+      <>
+        <h1>Footer</h1>
+      </>
+    )
+}`
+      );
+      console.log("Created Footer component.");
+    } catch (error) {
+      console.error("Error creating components:", error.message);
+    }
+
     console.log("\nUpdating template files...");
     try {
       const appJsxPath = path.join(
@@ -158,17 +203,33 @@ async function run() {
       );
       if (fs.existsSync(appJsxPath)) {
         try {
-          fs.writeFileSync(
-            appJsxPath,
-            `export default function App() {
+          const appContent = projectInfo.packages.includes("React Router")
+            ? `import { Outlet } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
+export default function App() {
   return (
     <>
-      <h1>ESYT</h1>
+      <Navbar/>
+      <Outlet/>
+      <Footer/>
     </>
   );
-}
-`
-          );
+}`
+            : `import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
+export default function App() {
+  return (
+    <>
+      <Navbar/>
+      <Footer/>
+    </>
+  );
+}`;
+
+          fs.writeFileSync(appJsxPath, appContent);
           console.log("Updated App component with clean template.");
         } catch (error) {
           console.error(`Failed to update App component: ${error.message}`);
