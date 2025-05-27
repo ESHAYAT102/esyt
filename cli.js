@@ -289,6 +289,9 @@ const router = createBrowserRouter([
   {
     path: "/",
     Component: App,
+    children: [
+    {index: true, Component: Home}
+    ]
   },
 ]);
 
@@ -443,8 +446,6 @@ lerna-debug.log*
 
 # Dependencies
 node_modules
-dist
-dist-ssr
 *.local
 
 # Editor directories and files
