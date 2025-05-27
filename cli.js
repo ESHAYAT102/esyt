@@ -218,6 +218,7 @@ export default function App() {
   );
 }`
             : `import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
 import Footer from "./components/Footer";
 
 export default function App() {
@@ -345,6 +346,7 @@ import App from "./App${
                   projectInfo.language === "JavaScript" ? ".jsx" : ".tsx"
                 }";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./pages/Home.jsx"
 
 const router = createBrowserRouter([
   {
@@ -390,7 +392,49 @@ createRoot(document.getElementById("root")).render(
           console.log("\nAdding Firebase...");
           try {
             execSync("npm i firebase", { stdio: "inherit" });
-            console.log("✅ Firebase installed.");
+
+            // Create firebase directory and config file
+            const firebaseDir = path.join(projectPath, "src", "firebase");
+            if (!fs.existsSync(firebaseDir)) {
+              fs.mkdirSync(firebaseDir, { recursive: true });
+            }
+
+            // Create firebase.config.js
+            const firebaseConfigPath = path.join(
+              firebaseDir,
+              "firebase.config.js"
+            );
+            fs.writeFileSync(
+              firebaseConfigPath,
+              `import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);`
+            );
+
+            // Create .env file
+            const envPath = path.join(projectPath, ".env");
+            fs.writeFileSync(
+              envPath,
+              `VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_APP_ID=
+VITE_SERVER_URL=`
+            );
+
+            console.log("✅ Firebase installed and configured.");
           } catch (error) {
             console.error(`❌ Failed to install Firebase: ${error.message}`);
           }
@@ -485,6 +529,35 @@ createRoot(document.getElementById("root")).render(
       console.log(
         "You will need to run 'npm install' manually before installing any packages."
       );
+    }
+
+    // Create pages directory and Home component
+    console.log("\nCreating pages directory and components...");
+    try {
+      const pagesDir = path.join(projectPath, "src", "pages");
+      if (!fs.existsSync(pagesDir)) {
+        fs.mkdirSync(pagesDir);
+        console.log("Created pages directory.");
+      }
+
+      // Create Home component
+      const homePath = path.join(
+        pagesDir,
+        `Home.${projectInfo.language === "JavaScript" ? "jsx" : "tsx"}`
+      );
+      fs.writeFileSync(
+        homePath,
+        `export default function Home() {
+    return (
+      <>
+        <h1>Home</h1>
+      </>
+    )
+}`
+      );
+      console.log("Created Home component.");
+    } catch (error) {
+      console.error("Error creating pages:", error.message);
     }
 
     if (projectInfo.gitInit) {
