@@ -25,6 +25,7 @@ pnpm create esyt
 - 🔄 **JavaScript or TypeScript** - Choose your preferred language
 - 🎨 **TailwindCSS** - Utility-first CSS framework for rapid UI development
 - 🛣️ **React Router** - Declarative routing for React applications
+- 💖 **React Icons** - Countless Different Icons For React
 - 🎭 **Framer Motion** - Production-ready animation library for React
 - 🌐 **OGL** - Minimal WebGL framework for creative coding projects
 - 🔥 **Firebase** - Google's platform for building web and mobile applications
@@ -46,7 +47,7 @@ Just run one of the installation commands above and follow the interactive promp
 
 1. **Project Name**: Enter a name for your project (default: "esyt-app")
 2. **Language**: Choose between JavaScript or TypeScript
-3. **Packages**: Select from TailwindCSS, React Router, Framer Motion, OGL, MongoDB, Firebase, Clerk, Appwrite, and Prisma
+3. **Packages**: Select from TailwindCSS, React Router, React Icons, Framer Motion, OGL, DotENV, Axios, Firebase Clerk, Appwrite, Prisma
 4. **Git**: Choose whether to initialize a Git repository
 5. **Dependencies**: Choose whether to automatically install dependencies
 6. **Dev Server**: Choose whether to run the development server automatically after setup
@@ -58,7 +59,7 @@ Just run one of the installation commands above and follow the interactive promp
 $ npm create esyt
  ? What will your project be called? esyt-app
  ? Will you be using JavaScript or TypeScript? JavaScript
- ? Which packages would you like to enable? TailwindCSS, React Router, Firebase
+ ? Which packages would you like to enable? TailwindCSS, React Router, React Icons, DotENV, Axios, Firebase
  ? Initialize a new git repository? Yes
  ? Would you like us to run 'npm i'? Yes
  ? Would you like to run the development server automatically after setup? Yes
@@ -74,6 +75,7 @@ Depending on your selections, your project will be set up with:
 - A Vite-powered React project with JavaScript or TypeScript
 - TailwindCSS for styling
 - React Router for application routing
+- React Icons for easy icon access
 - Framer Motion animation library
 - OGL WebGL framework for 3D graphics
 - Firebase Authenticataion

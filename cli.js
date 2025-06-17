@@ -32,6 +32,7 @@ async function run() {
         choices: [
           "TailwindCSS",
           "React Router",
+          "React Icons",
           "Framer Motion",
           "OGL",
           "DotENV",
@@ -312,10 +313,20 @@ export default function App() {
           }
         }
 
+        if (projectInfo.packages.includes("React Icons")) {
+          console.log("\nAdding React Icons...");
+          try {
+            execSync("npm i react-icons", { stdio: "inherit" });
+            console.log("✅ React Icons installed.");
+          } catch (error) {
+            console.error(`❌ Failed to install React Icons: ${error.message}`);
+          }
+        }
+
         if (projectInfo.packages.includes("Framer Motion")) {
           console.log("\nAdding Framer Motion...");
           try {
-            execSync("npm i framer-motion", { stdio: "inherit" });
+            execSync("npm i framer-motion motion", { stdio: "inherit" });
             console.log("✅ Framer Motion installed.");
           } catch (error) {
             console.error(
