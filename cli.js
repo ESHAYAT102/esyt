@@ -615,12 +615,52 @@ VITE_SERVER_URL=`
         console.error("Error creating pages:", error.message);
       }
     } else if (framework === "Next.js") {
+      // --- Next.js extra options prompt ---
+      const nextOptions = await inquirer.prompt([
+        {
+          type: "confirm",
+          name: "eslint",
+          message: "Would you like to use ESLint?",
+          default: true,
+        },
+        {
+          type: "confirm",
+          name: "srcDir",
+          message: "Would you like your code inside a 'src/' directory?",
+          default: true,
+        },
+        {
+          type: "confirm",
+          name: "appRouter",
+          message: "Would you like to use App Router? (recommended)",
+          default: true,
+        },
+        {
+          type: "confirm",
+          name: "turbo",
+          message: "Would you like to use Turbopack for 'next dev'?",
+          default: true,
+        },
+        {
+          type: "confirm",
+          name: "importAlias",
+          message:
+            "Would you like to customize the import alias (@/* by default)?",
+          default: true,
+        },
+      ]);
+      // Tailwind CSS autofill
+      const useTailwind = packages.includes("TailwindCSS");
       // --- Next.js project creation ---
       console.log("Running: npx create-next-app@latest");
       let nextCommand = `npx create-next-app@latest ${projectName}`;
-      if (language === "TypeScript") {
-        nextCommand += " --typescript";
-      }
+      if (language === "TypeScript") nextCommand += " --typescript";
+      nextCommand += nextOptions.eslint ? " --eslint" : " --no-eslint";
+      nextCommand += useTailwind ? " --tailwind" : " --no-tailwind";
+      nextCommand += nextOptions.srcDir ? " --src-dir" : " --no-src-dir";
+      nextCommand += nextOptions.appRouter ? " --app" : " --no-app";
+      nextCommand += nextOptions.turbo ? " --turbo" : " --no-turbo";
+      if (nextOptions.importAlias) nextCommand += ' --import-alias "@/*"';
       execSync(nextCommand, { stdio: "inherit" });
       console.log("Next.js project created.");
       process.chdir(projectPath);
