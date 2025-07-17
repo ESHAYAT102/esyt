@@ -679,12 +679,22 @@ VITE_SERVER_URL=`
       }
       // Scaffold components directory and Navbar/Footer
       try {
-        const componentsDir = path.join(projectPath, "components");
+        // Determine base app directory for components
+        let baseAppDir = projectPath;
+        if (nextOptions.srcDir) {
+          baseAppDir = path.join(projectPath, "src", "app");
+        } else {
+          baseAppDir = path.join(projectPath, "app");
+        }
+        if (!fs.existsSync(baseAppDir)) {
+          fs.mkdirSync(baseAppDir, { recursive: true });
+        }
+        const componentsDir = path.join(baseAppDir, "components");
         if (!fs.existsSync(componentsDir)) {
           fs.mkdirSync(componentsDir);
-          console.log("Created components directory.");
+          console.log("Created components directory inside app.");
         }
-        const ext = language === "JavaScript" ? "js" : "tsx";
+        const ext = language === "JavaScript" ? "jsx" : "tsx";
         const navbarPath = path.join(componentsDir, `Navbar.${ext}`);
         fs.writeFileSync(
           navbarPath,
@@ -695,7 +705,9 @@ VITE_SERVER_URL=`
           footerPath,
           `export default function Footer() {\n  return (\n    <footer style={{padding: 16, borderTop: '1px solid #eee'}}>\n      <h1>Footer</h1>\n    </footer>\n  )\n}`
         );
-        console.log("Created Navbar and Footer components.");
+        console.log(
+          "Created Navbar and Footer components inside app/components."
+        );
       } catch (error) {
         console.error("Error creating components:", error.message);
       }
@@ -718,6 +730,29 @@ VITE_SERVER_URL=`
         console.log("Created sample API route.");
       } catch (error) {
         console.error("Error creating API route:", error.message);
+      }
+      // Scaffold sample page (Home) in app directory
+      try {
+        let baseAppDir = projectPath;
+        if (nextOptions.srcDir) {
+          baseAppDir = path.join(projectPath, "src", "app");
+        } else {
+          baseAppDir = path.join(projectPath, "app");
+        }
+        // Create 'home' page folder and file
+        const homePageDir = path.join(baseAppDir, "home");
+        if (!fs.existsSync(homePageDir)) {
+          fs.mkdirSync(homePageDir, { recursive: true });
+        }
+        const ext = language === "JavaScript" ? "jsx" : "tsx";
+        const homePageFile = path.join(homePageDir, `page.${ext}`);
+        fs.writeFileSync(
+          homePageFile,
+          `export default function Home() {\n  return (\n    <main style={{padding: 32}}><h1>Home</h1></main>\n  )\n}`
+        );
+        console.log(`Created Home page as app/home/page.${ext}`);
+      } catch (error) {
+        console.error("Error creating Home page:", error.message);
       }
       // Scaffold .env.local
       try {
