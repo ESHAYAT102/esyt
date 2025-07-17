@@ -1,10 +1,10 @@
 # ESYT
 
-A modern CLI tool to quickly scaffold React projects with your preferred tech stack.
+A modern CLI tool to quickly scaffold Vite or Next.js projects with your preferred tech stack.
 
 ## Overview
 
-`esyt` is a command-line interface tool that helps you create new React projects with optional TypeScript support and popular packages like Framer Motion, Clerk, Appwrite, and Prisma. It's built on top of Vite for lightning-fast development experience.
+`esyt` is a command-line interface tool that helps you create new Vite or Next.js projects with JavaScript or TypeScript, and popular packages like TailwindCSS, Framer Motion, Clerk, Appwrite, Prisma, and more. It provides a clean, professional setup experience with minimal output and smart automation.
 
 ## Installation
 
@@ -16,82 +16,80 @@ npm create esyt@latest
 
 # Using pnpm
 pnpm create esyt
-
 ```
 
 ## Features
 
-- 🚀 **Vite-powered** - Blazing fast development server and optimized builds
+- 🏗️ **Framework Choice** - Start with Vite or Next.js
+- 🚀 **Vite-powered** or **Next.js-powered** - Modern, fast, and flexible
 - 🔄 **JavaScript or TypeScript** - Choose your preferred language
 - 🎨 **TailwindCSS** - Utility-first CSS framework for rapid UI development
-- 🛣️ **React Router** - Declarative routing for React applications
+- 🛣️ **React Router** (Vite only) - Declarative routing for React applications
 - 💖 **React Icons** - Countless Different Icons For React
 - 🎭 **Framer Motion** - Production-ready animation library for React
-- 🌐 **OGL** - Minimal WebGL framework for creative coding projects
+- 🌐 **OGL** (Vite only) - Minimal WebGL framework for creative coding projects
 - 🔥 **Firebase** - Google's platform for building web and mobile applications
-- 🗄️ **MongoDB** - Popular NoSQL database for modern applications
 - 🔒 **Clerk** - Complete user management solution
 - ☁️ **Appwrite** - Open source backend server for web and mobile apps
 - 💾 **Prisma** - Next-generation ORM for Node.js and TypeScript
 - 🔑 **DotENV** - Zero-dependency module for loading environment variables
 - 🌐 **Axios** - Promise-based HTTP client for the browser and node.js
-- 🧩 **Customizable** - Select only the packages you need
+- 🧩 **Next.js Extras** - next-auth, @next/font, next-seo, next-sitemap, next-pwa
+- ⚙️ **Next.js Options** - ESLint, Tailwind, src/app, App Router, Turbopack, import alias (all via prompt)
 - 📦 **Dependency Installation** - Option to automatically install dependencies
-- 🔄 **Git Integration** - Option to initialize a Git repository
+- 🔄 **Git Integration** - Option to initialize a Git repository (or not, with .git folder cleanup)
 - 🚀 **Auto Dev Server** - Option to run the development server automatically after setup
-- 🖥️ **IDE Integration** - Option to open your project with VSCode, Cursor, or Trae IDE
+- 🖥️ **IDE Integration** - Option to open your project with VSCode, Cursor, Trae, or None
+- 🧹 **Clean Output** - Minimal, professional CLI output
 
 ## Usage
 
 Just run one of the installation commands above and follow the interactive prompts:
 
-1. **Project Name**: Enter a name for your project (default: "esyt-app")
-2. **Language**: Choose between JavaScript or TypeScript
-3. **Packages**: Select from TailwindCSS, React Router, React Icons, Framer Motion, OGL, DotENV, Axios, Firebase Clerk, Appwrite, Prisma
-4. **Git**: Choose whether to initialize a Git repository
-5. **Dependencies**: Choose whether to automatically install dependencies
-6. **Dev Server**: Choose whether to run the development server automatically after setup
-7. **IDE Selection**: Choose which IDE to open your project with (VSCode, Cursor, Trae, or None)
+1. **Framework**: Choose Vite or Next.js
+2. **Language**: Choose JavaScript or TypeScript
+3. **Project Name**: Enter a name (no spaces allowed)
+4. **Packages**: Select from a contextual list (Vite or Next.js compatible)
+5. **Next.js Options**: (if Next.js) ESLint, Tailwind, src/app, App Router, Turbopack, import alias
+6. **Git**: Choose whether to initialize a Git repository
+7. **Dependencies**: Choose whether to automatically install dependencies
+8. **Dev Server**: Choose whether to run the development server automatically after setup
+9. **IDE Selection**: Choose which IDE to open your project with (VSCode, Cursor, Trae, or None)
 
 ## Example
 
 ```bash
 $ npm create esyt
- ? What will your project be called? esyt-app
- ? Will you be using JavaScript or TypeScript? JavaScript
- ? Which packages would you like to enable? TailwindCSS, React Router, React Icons, DotENV, Axios, Firebase
- ? Initialize a new git repository? Yes
- ? Would you like us to run 'npm i'? Yes
- ? Would you like to run the development server automatically after setup? Yes
- ? Which IDE would you like to open your project with? VSCode
-
- Good choice! Using JavaScript!
+? Which framework would you like to use? Next.js
+? Will you be using JavaScript or TypeScript? TypeScript
+? What will your project be called? my-next-app
+? Which packages would you like to enable? TailwindCSS, next-auth, Prisma
+? Would you like to use ESLint? Yes
+? Would you like your code inside a 'src/' directory? Yes
+? Would you like to use App Router? Yes
+? Would you like to use Turbopack for 'next dev'? Yes
+? Would you like to customize the import alias (@/* by default)? Yes
+? Initialize a new git repository? No
+? Would you like us to run 'npm i'? Yes
+? Would you like to run the development server automatically after setup? No
+? Which IDE would you like to open your project with? None
 ```
 
 ## What's Included
 
 Depending on your selections, your project will be set up with:
 
-- A Vite-powered React project with JavaScript or TypeScript
-- TailwindCSS for styling
-- React Router for application routing
-- React Icons for easy icon access
-- Framer Motion animation library
-- OGL WebGL framework for 3D graphics
-- Firebase Authenticataion
-- MongoDB database integration
-- Clerk authentication setup
-- Appwrite backend integration
-- Prisma ORM with PostgreSQL configuration
-- DotENV for environment variable management
-- Axios for making HTTP requests
+- A Vite or Next.js project with JavaScript or TypeScript
+- Contextual package selection (only compatible packages shown)
+- Next.js-specific options (ESLint, Tailwind, src/app, App Router, Turbopack, import alias)
+- TailwindCSS, React Router (Vite), React Icons, Framer Motion, OGL (Vite), Firebase, Clerk, Appwrite, Prisma, DotENV, Axios, and more
+- Automatic .git folder removal if git is not requested
 - Automatic project opening in your preferred IDE (VSCode, Cursor, or Trae)
+- Clean, minimal output
 
 ## After Installation
 
-Everything is ready to go!
-
-You can start editing your project right up.
+Your project is ready to go! Just follow the standard start instructions for Vite or Next.js.
 
 ## Contributing
 

@@ -39,6 +39,12 @@ async function run() {
         name: "projectName",
         message: "What will your project be called?",
         default: "esyt-app",
+        validate: (input) => {
+          if (/\s/.test(input)) {
+            return "Project name cannot contain spaces. Please use dashes or underscores.";
+          }
+          return true;
+        },
       },
     ]);
 
@@ -133,49 +139,35 @@ async function run() {
 
       execSync(viteCommand, { stdio: "inherit" });
 
-      console.log("Vite project created with the specified template.");
-
       process.chdir(projectPath);
-      console.log(`Changed directory to: ${projectName}`);
 
       try {
         if (installDeps) {
-          console.log("Installing initial dependencies...");
           execSync("npm i", { stdio: "inherit" });
-        } else {
-          console.log(
-            "Skipping initial dependencies installation as requested."
-          );
         }
       } catch (error) {
         console.error("Error during initial setup:", error.message);
       }
 
-      console.log("\nCleaning up unnecessary files...");
       try {
         const filesToRemove = [
           {
             path: path.join(projectPath, "src", "assets"),
             isDir: true,
-            name: "assets folder",
           },
           {
             path: path.join(projectPath, "README.md"),
             isDir: false,
-            name: "README.md file",
           },
           {
             path: path.join(projectPath, "public", "vite.svg"),
             isDir: false,
-            name: "vite.svg from public folder",
           },
           {
             path: path.join(projectPath, "src", "App.css"),
             isDir: false,
-            name: "App.css file",
           },
         ];
-
         for (const file of filesToRemove) {
           if (fs.existsSync(file.path)) {
             try {
@@ -184,62 +176,34 @@ async function run() {
               } else {
                 fs.unlinkSync(file.path);
               }
-              console.log(`Removed ${file.name}.`);
-            } catch (error) {
-              console.warn(`Failed to remove ${file.name}: ${error.message}`);
-            }
+            } catch (error) {}
           }
         }
-      } catch (error) {
-        console.error("Error during cleanup:", error.message);
-      }
+      } catch (error) {}
 
-      console.log("\nCreating components folder and files...");
       try {
         const componentsDir = path.join(projectPath, "src", "components");
         if (!fs.existsSync(componentsDir)) {
           fs.mkdirSync(componentsDir);
-          console.log("Created components directory.");
         }
-
-        // Create Navbar component
         const navbarPath = path.join(
           componentsDir,
           `Navbar.${language === "JavaScript" ? "jsx" : "tsx"}`
         );
         fs.writeFileSync(
           navbarPath,
-          `export default function Navbar() {
-    return (
-      <>
-        <h1>Navbar</h1>
-      </>
-    )
-}`
+          `export default function Navbar() {\n  return (\n    <>\n      <h1>Navbar</h1>\n    </>\n  )\n}`
         );
-        console.log("Created Navbar component.");
-
-        // Create Footer component
         const footerPath = path.join(
           componentsDir,
           `Footer.${language === "JavaScript" ? "jsx" : "tsx"}`
         );
         fs.writeFileSync(
           footerPath,
-          `export default function Footer() {
-    return (
-      <>
-        <h1>Footer</h1>
-      </>
-    )
-}`
+          `export default function Footer() {\n  return (\n    <>\n      <h1>Footer</h1>\n    </>\n  )\n}`
         );
-        console.log("Created Footer component.");
-      } catch (error) {
-        console.error("Error creating components:", error.message);
-      }
+      } catch (error) {}
 
-      console.log("\nUpdating template files...");
       try {
         const appJsxPath = path.join(
           projectPath,
@@ -249,99 +213,37 @@ async function run() {
         if (fs.existsSync(appJsxPath)) {
           try {
             const appContent = packages.includes("React Router")
-              ? `import { Outlet } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-
-export default function App() {
-  return (
-    <>
-      <Navbar/>
-      <Outlet/>
-      <Footer/>
-    </>
-  );
-}`
-              : `import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import Footer from "./components/Footer";
-
-export default function App() {
-  return (
-    <>
-      <Navbar/>
-      <Footer/>
-    </>
-  );
-}`;
-
+              ? `import { Outlet } from "react-router-dom";\nimport Navbar from "./components/Navbar";\nimport Footer from "./components/Footer";\n\nexport default function App() {\n  return (\n    <>\n      <Navbar/>\n      <Outlet/>\n      <Footer/>\n    </>\n  );\n}`
+              : `import Navbar from "./components/Navbar";\nimport Home from "./pages/Home";\nimport Footer from "./components/Footer";\n\nexport default function App() {\n  return (\n    <>\n      <Navbar/>\n      <Footer/>\n    </>\n  );\n}`;
             fs.writeFileSync(appJsxPath, appContent);
-            console.log("Updated App component with clean template.");
-          } catch (error) {
-            console.error(`Failed to update App component: ${error.message}`);
-          }
-        } else {
-          console.warn(`App component file not found at ${appJsxPath}`);
+          } catch (error) {}
         }
-
         const indexHtmlPath = path.join(projectPath, "index.html");
         if (fs.existsSync(indexHtmlPath)) {
           try {
             fs.writeFileSync(
               indexHtmlPath,
-              `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./src/index.css" />
-    <title>ESYT App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.${
-      language === "JavaScript" ? "jsx" : "tsx"
-    }"></script>
-  </body>
-</html>
-`
+              `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${
+                language === "JavaScript" ? "jsx" : "tsx"
+              }\"></script>\n  </body>\n</html>\n`
             );
-            console.log("Updated index.html with clean template.");
-          } catch (error) {
-            console.error(`Failed to update index.html: ${error.message}`);
-          }
-        } else {
-          console.warn(`index.html not found at ${indexHtmlPath}`);
+          } catch (error) {}
         }
-      } catch (error) {
-        console.error("Error updating template files:", error.message);
-      }
+      } catch (error) {}
 
       if (installDeps) {
-        console.log("\nInstalling selected packages...");
         try {
           if (packages.includes("Clerk")) {
-            console.log("\nAdding Clerk...");
             try {
               execSync("npm i @clerk/clerk-react --save", { stdio: "inherit" });
-              console.log("✅ Clerk installed.");
-            } catch (error) {
-              console.error(`❌ Failed to install Clerk: ${error.message}`);
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("Appwrite")) {
-            console.log("\nAdding Appwrite...");
             try {
               execSync("npm i appwrite", { stdio: "inherit" });
-              console.log("✅ Appwrite installed.");
-            } catch (error) {
-              console.error(`❌ Failed to install Appwrite: ${error.message}`);
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("Prisma")) {
-            console.log("\nAdding Prisma...");
             try {
               execSync("npm i prisma --save-dev", { stdio: "inherit" });
               execSync("npm i @prisma/client", { stdio: "inherit" });
@@ -351,43 +253,21 @@ export default function App() {
                   stdio: "inherit",
                 }
               );
-              console.log("✅ Prisma initialized.");
-            } catch (error) {
-              console.error(`❌ Failed to install Prisma: ${error.message}`);
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("React Icons")) {
-            console.log("\nAdding React Icons...");
             try {
               execSync("npm i react-icons", { stdio: "inherit" });
-              console.log("✅ React Icons installed.");
-            } catch (error) {
-              console.error(
-                `❌ Failed to install React Icons: ${error.message}`
-              );
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("Framer Motion")) {
-            console.log("\nAdding Framer Motion...");
             try {
               execSync("npm i framer-motion motion", { stdio: "inherit" });
-              console.log("✅ Framer Motion installed.");
-            } catch (error) {
-              console.error(
-                `❌ Failed to install Framer Motion: ${error.message}`
-              );
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("React Router")) {
-            console.log("\nAdding React Router...");
             try {
               execSync("npm i react-router-dom", { stdio: "inherit" });
-              console.log("✅ React Router installed.");
-
-              // Update main entry file with React Router configuration
               const mainFilePath = path.join(
                 projectPath,
                 "src",
@@ -396,140 +276,59 @@ export default function App() {
               if (fs.existsSync(mainFilePath)) {
                 fs.writeFileSync(
                   mainFilePath,
-                  `import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App${language === "JavaScript" ? ".jsx" : ".tsx"}";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from "./pages/Home.jsx"
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    Component: App,
-    children: [
-    {index: true, Component: Home}
-    ]
-  },
-]);
-
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <RouterProvider router={router}></RouterProvider>
-  </StrictMode>
-);
-`
+                  `import { StrictMode } from "react";\nimport { createRoot } from "react-dom/client";\nimport "./index.css";\nimport App from "./App${
+                    language === "JavaScript" ? ".jsx" : ".tsx"
+                  }";\nimport { createBrowserRouter, RouterProvider } from "react-router-dom";\nimport Home from "./pages/Home.jsx"\n\nconst router = createBrowserRouter([\n  {\n    path: "/",\n    Component: App,\n    children: [\n    {index: true, Component: Home}\n    ]\n  },\n]);\n\ncreateRoot(document.getElementById("root")).render(\n  <StrictMode>\n    <RouterProvider router={router}></RouterProvider>\n  </StrictMode>\n);\n`
                 );
-                console.log(
-                  "✅ Updated main entry file with React Router configuration."
-                );
-              } else {
-                console.warn(`Main entry file not found at ${mainFilePath}`);
               }
-            } catch (error) {
-              console.error(
-                `❌ Failed to install React Router: ${error.message}`
-              );
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("OGL")) {
-            console.log("\nAdding OGL (WebGL Framework)...");
             try {
               execSync("npm i ogl", { stdio: "inherit" });
-              console.log("✅ OGL installed.");
-            } catch (error) {
-              console.error(`❌ Failed to install OGL: ${error.message}`);
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("Firebase")) {
-            console.log("\nAdding Firebase...");
             try {
               execSync("npm i firebase", { stdio: "inherit" });
-
-              // Create firebase directory and config file
               const firebaseDir = path.join(projectPath, "src", "firebase");
               if (!fs.existsSync(firebaseDir)) {
                 fs.mkdirSync(firebaseDir, { recursive: true });
               }
-
-              // Create firebase.config.js
               const firebaseConfigPath = path.join(
                 firebaseDir,
                 "firebase.config.js"
               );
               fs.writeFileSync(
                 firebaseConfigPath,
-                `import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);`
+                `import { initializeApp } from "firebase/app";\nimport { getAuth } from "firebase/auth";\n\nconst firebaseConfig = {\n  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,\n  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,\n  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,\n  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,\n  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,\n  appId: import.meta.env.VITE_FIREBASE_APP_ID,\n};\n\nconst app = initializeApp(firebaseConfig);\nexport const auth = getAuth(app);`
               );
-
-              // Create .env file
               const envPath = path.join(projectPath, ".env");
               fs.writeFileSync(
                 envPath,
-                `VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_APP_ID=
-VITE_SERVER_URL=`
+                `VITE_FIREBASE_API_KEY=\nVITE_FIREBASE_AUTH_DOMAIN=\nVITE_FIREBASE_PROJECT_ID=\nVITE_FIREBASE_STORAGE_BUCKET=\nVITE_FIREBASE_APP_ID=\nVITE_SERVER_URL=`
               );
-
-              console.log("✅ Firebase installed and configured.");
-            } catch (error) {
-              console.error(`❌ Failed to install Firebase: ${error.message}`);
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("DotENV")) {
-            console.log("\nAdding DotENV...");
             try {
               execSync("npm i dotenv", { stdio: "inherit" });
-              console.log("✅ DotENV installed.");
-            } catch (error) {
-              console.error(`❌ Failed to install DotENV: ${error.message}`);
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("Axios")) {
-            console.log("\nAdding Axios...");
             try {
               execSync("npm i axios", { stdio: "inherit" });
-              console.log("✅ Axios installed.");
-            } catch (error) {
-              console.error(`❌ Failed to install Axios: ${error.message}`);
-            }
+            } catch (error) {}
           }
-
           if (packages.includes("TailwindCSS")) {
-            console.log("\nAdding Tailwind CSS...");
             try {
               execSync("npm install tailwindcss @tailwindcss/vite", {
                 stdio: "inherit",
               });
-
               const indexCssPath = path.join(projectPath, "src", "index.css");
               if (fs.existsSync(indexCssPath)) {
                 fs.writeFileSync(indexCssPath, `@import "tailwindcss";\n`);
-                console.log("✅ Updated index.css with Tailwind directives.");
-              } else {
-                console.warn(`index.css not found at ${indexCssPath}`);
               }
-
               const tailwindConfigPath = path.join(
                 projectPath,
                 "tailwind.config.js"
@@ -540,80 +339,33 @@ VITE_SERVER_URL=`
                     tailwindConfigPath,
                     `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`
                   );
-                  console.log(
-                    "✅ Created tailwind.config.js with proper configuration."
-                  );
-                } else {
-                  console.log(
-                    "✅ tailwind.config.js already exists, skipping creation."
-                  );
                 }
-              } catch (error) {
-                console.error(
-                  `❌ Failed to create tailwind.config.js: ${error.message}`
-                );
-              }
-
+              } catch (error) {}
               const viteConfigPath = path.join(projectPath, "vite.config.js");
               if (fs.existsSync(viteConfigPath)) {
                 fs.writeFileSync(
                   viteConfigPath,
                   `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`
                 );
-                console.log(
-                  "✅ Updated vite.config.js with TailwindCSS configuration."
-                );
-              } else {
-                console.warn(`vite.config.js not found at ${viteConfigPath}`);
               }
-
-              console.log("✅ Tailwind CSS installed and configured.");
-            } catch (error) {
-              console.error(
-                `❌ Failed to install Tailwind CSS: ${error.message}`
-              );
-            }
+            } catch (error) {}
           }
-        } catch (error) {
-          console.error("Error installing packages:", error.message);
-        }
-      } else {
-        console.log(
-          "\nSkipping package installations as npm install was not selected."
-        );
-        console.log(
-          "You will need to run 'npm install' manually before installing any packages."
-        );
+        } catch (error) {}
       }
-
-      // Create pages directory and Home component
-      console.log("\nCreating pages directory and components...");
       try {
         const pagesDir = path.join(projectPath, "src", "pages");
         if (!fs.existsSync(pagesDir)) {
           fs.mkdirSync(pagesDir);
-          console.log("Created pages directory.");
         }
-
-        // Create Home component
         const homePath = path.join(
           pagesDir,
           `Home.${language === "JavaScript" ? "jsx" : "tsx"}`
         );
         fs.writeFileSync(
           homePath,
-          `export default function Home() {
-    return (
-      <>
-        <h1>Home</h1>
-      </>
-    )
-}`
+          `export default function Home() {\n  return (\n    <>\n      <h1>Home</h1>\n    </>\n  )\n}`
         );
-        console.log("Created Home component.");
-      } catch (error) {
-        console.error("Error creating pages:", error.message);
-      }
+      } catch (error) {}
     } else if (framework === "Next.js") {
       // --- Next.js extra options prompt ---
       const nextOptions = await inquirer.prompt([
@@ -641,26 +393,26 @@ VITE_SERVER_URL=`
           message: "Would you like to use Turbopack for 'next dev'?",
           default: true,
         },
-        {
-          type: "confirm",
-          name: "importAlias",
-          message:
-            "Would you like to customize the import alias (@/* by default)?",
-          default: true,
-        },
       ]);
       // Tailwind CSS autofill
       const useTailwind = packages.includes("TailwindCSS");
       // --- Next.js project creation ---
       console.log("Running: npx create-next-app@latest");
       let nextCommand = `npx create-next-app@latest ${projectName}`;
-      if (language === "TypeScript") nextCommand += " --typescript";
+      // Set language flag for Next.js
+      if (language === "TypeScript") {
+        nextCommand += " --ts";
+      } else {
+        nextCommand += " --js";
+      }
       nextCommand += nextOptions.eslint ? " --eslint" : " --no-eslint";
       nextCommand += useTailwind ? " --tailwind" : " --no-tailwind";
       nextCommand += nextOptions.srcDir ? " --src-dir" : " --no-src-dir";
       nextCommand += nextOptions.appRouter ? " --app" : " --no-app";
-      nextCommand += nextOptions.turbo ? " --turbo" : " --no-turbo";
-      if (nextOptions.importAlias) nextCommand += ' --import-alias "@/*"';
+      // Add Turbopack flags only if selected, per official docs (Made the import alias static to yes as it was not possible to automate for no)
+      if (nextOptions.turbo) {
+        nextCommand += ' --turbopack --import-alias "@/*"';
+      }
       execSync(nextCommand, { stdio: "inherit" });
       console.log("Next.js project created.");
       process.chdir(projectPath);
@@ -771,10 +523,29 @@ VITE_SERVER_URL=`
           try {
             switch (pkg) {
               case "TailwindCSS":
-                execSync("npx tailwindcss init -p", { stdio: "inherit" });
-                execSync("npm install tailwindcss postcss autoprefixer", {
-                  stdio: "inherit",
-                });
+                // For Next.js, install tailwindcss, @tailwindcss/postcss, postcss
+                execSync(
+                  "npm install tailwindcss @tailwindcss/postcss postcss",
+                  { stdio: "inherit" }
+                );
+                // Write postcss.config.mjs
+                const postcssConfigPath = path.join(
+                  projectPath,
+                  "postcss.config.mjs"
+                );
+                fs.writeFileSync(
+                  postcssConfigPath,
+                  'const config = {  plugins: {    "@tailwindcss/postcss": {},  },};\nexport default config;'
+                );
+                // Update globals.css in app or src/app
+                let baseAppDir = projectPath;
+                if (nextOptions.srcDir) {
+                  baseAppDir = path.join(projectPath, "src", "app");
+                } else {
+                  baseAppDir = path.join(projectPath, "app");
+                }
+                const globalsCssPath = path.join(baseAppDir, "globals.css");
+                fs.writeFileSync(globalsCssPath, '@import "tailwindcss";\n');
                 break;
               case "React Icons":
                 execSync("npm i react-icons", { stdio: "inherit" });
@@ -832,8 +603,8 @@ VITE_SERVER_URL=`
 
     // --- Git init, IDE, dev server, etc. (shared) ---
     if (gitInit) {
-      console.log("\nInitializing Git repository...");
       try {
+        console.log("\nInitializing Git repository...");
         execSync("git init", { stdio: "inherit" });
         const gitignorePath = path.join(projectPath, ".gitignore");
         if (!fs.existsSync(gitignorePath)) {
@@ -850,7 +621,11 @@ VITE_SERVER_URL=`
         );
       }
     } else {
-      console.log("\nSkipping Git repository initialization as requested.");
+      // Remove .git folder if it exists
+      const gitFolder = path.join(projectPath, ".git");
+      if (fs.existsSync(gitFolder)) {
+        fs.rmSync(gitFolder, { recursive: true, force: true });
+      }
     }
     // Open the project with the selected IDE
     try {
@@ -881,30 +656,11 @@ VITE_SERVER_URL=`
             `To open manually, run: 'cd ${projectName}' and then the appropriate IDE command.`
           );
         }
-      } else {
-        console.log("Skipping IDE launch as requested.");
       }
     } catch (error) {
       console.error("Error during IDE launch:", error.message);
     }
     console.log("\n✨ Project setup complete! ✨");
-    if (runDevServer) {
-      console.log("\nStarting development server...");
-      try {
-        execSync("npm run dev", { stdio: "inherit" });
-      } catch (error) {
-        console.error(
-          `❌ Failed to start development server: ${error.message}`
-        );
-        console.log(
-          `To start manually, run: 'cd ${projectName}' and 'npm run dev'`
-        );
-      }
-    } else {
-      console.log(
-        `\nTo start your project, run: 'cd ${projectName}' and 'npm run dev'`
-      );
-    }
   } catch (error) {
     console.error(
       "\n❌ An error occurred during project setup:",
