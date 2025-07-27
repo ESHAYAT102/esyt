@@ -490,29 +490,6 @@ async function run() {
       } catch (error) {
         console.error("Error creating API route:", error.message);
       }
-      // Scaffold sample page (Home) in app directory
-      try {
-        let baseAppDir = projectPath;
-        if (nextOptions.srcDir) {
-          baseAppDir = path.join(projectPath, "src", "app");
-        } else {
-          baseAppDir = path.join(projectPath, "app");
-        }
-        // Create 'home' page folder and file
-        const homePageDir = path.join(baseAppDir, "home");
-        if (!fs.existsSync(homePageDir)) {
-          fs.mkdirSync(homePageDir, { recursive: true });
-        }
-        const ext = language === "JavaScript" ? "jsx" : "tsx";
-        const homePageFile = path.join(homePageDir, `page.${ext}`);
-        fs.writeFileSync(
-          homePageFile,
-          `export default function Home() {\n  return (\n    <main className="p-32"><h1>Home</h1></main>\n  )\n}`
-        );
-        console.log(`Created Home page as app/home/page.${ext}`);
-      } catch (error) {
-        console.error("Error creating Home page:", error.message);
-      }
       // Scaffold layout file in app directory
       try {
         let baseAppDir = projectPath;
@@ -577,6 +554,24 @@ export default function RootLayout({
         }
       } catch (error) {
         console.error("Error creating .env.local:", error.message);
+      }
+      // Overwrite main page file in app directory for Next.js
+      try {
+        let baseAppDir = projectPath;
+        if (nextOptions.srcDir) {
+          baseAppDir = path.join(projectPath, "src", "app");
+        } else {
+          baseAppDir = path.join(projectPath, "app");
+        }
+        const ext = language === "TypeScript" ? "tsx" : "jsx";
+        const mainPageFile = path.join(baseAppDir, `page.${ext}`);
+        fs.writeFileSync(
+          mainPageFile,
+          `export default function Home() {\n  return (\n    <div>\n      <h1>ESYT</h1>\n    </div>\n  );\n}`
+        );
+        console.log(`Overwritten main page as app/page.${ext}`);
+      } catch (error) {
+        console.error("Error writing main page:", error.message);
       }
       // Install selected packages (Next.js compatible)
       if (installDeps && packages.length > 0) {
