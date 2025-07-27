@@ -416,6 +416,13 @@ async function run() {
       execSync(nextCommand, { stdio: "inherit" });
       console.log("Next.js project created.");
       process.chdir(projectPath);
+      // Cleanup: Remove README.md for Next.js projects (to match Vite cleanup)
+      try {
+        const readmePath = path.join(projectPath, "README.md");
+        if (fs.existsSync(readmePath)) {
+          fs.unlinkSync(readmePath);
+        }
+      } catch (error) {}
       console.log(`Changed directory to: ${projectName}`);
       try {
         if (installDeps) {
@@ -450,12 +457,12 @@ async function run() {
         const navbarPath = path.join(componentsDir, `Navbar.${ext}`);
         fs.writeFileSync(
           navbarPath,
-          `export default function Navbar() {\n  return (\n    <nav style={{padding: 16, borderBottom: '1px solid #eee'}}>\n      <h1>Navbar</h1>\n    </nav>\n  )\n}`
+          `export default function Navbar() {\n  return (\n    <nav className="p-16 border-b border-slate-200">\n      <h1>Navbar</h1>\n    </nav>\n  )\n}`
         );
         const footerPath = path.join(componentsDir, `Footer.${ext}`);
         fs.writeFileSync(
           footerPath,
-          `export default function Footer() {\n  return (\n    <footer style={{padding: 16, borderTop: '1px solid #eee'}}>\n      <h1>Footer</h1>\n    </footer>\n  )\n}`
+          `export default function Footer() {\n  return (\n    <footer className="p-16 border-t border-slate-200">\n      <h1>Footer</h1>\n    </footer>\n  )\n}`
         );
         console.log(
           "Created Navbar and Footer components inside app/components."
@@ -500,7 +507,7 @@ async function run() {
         const homePageFile = path.join(homePageDir, `page.${ext}`);
         fs.writeFileSync(
           homePageFile,
-          `export default function Home() {\n  return (\n    <main style={{padding: 32}}><h1>Home</h1></main>\n  )\n}`
+          `export default function Home() {\n  return (\n    <main className="p-32"><h1>Home</h1></main>\n  )\n}`
         );
         console.log(`Created Home page as app/home/page.${ext}`);
       } catch (error) {
