@@ -513,6 +513,61 @@ async function run() {
       } catch (error) {
         console.error("Error creating Home page:", error.message);
       }
+      // Scaffold layout file in app directory
+      try {
+        let baseAppDir = projectPath;
+        if (nextOptions.srcDir) {
+          baseAppDir = path.join(projectPath, "src", "app");
+        } else {
+          baseAppDir = path.join(projectPath, "app");
+        }
+        const ext =
+          language === "TypeScript"
+            ? "tsx"
+            : language === "JavaScript"
+            ? "jsx"
+            : "js";
+        const layoutFile = path.join(baseAppDir, `layout.${ext}`);
+        const layoutCode = `import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "ESYT App",
+  description: "Project created with ESYT",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang=\"en\">
+      <body
+        className={\`${geistSans.variable} ${geistMono.variable} antialiased\`}
+      >
+        {children}
+      </body>
+    </html>
+  );
+}
+`;
+        fs.writeFileSync(layoutFile, layoutCode);
+        console.log(`Created layout file as app/layout.${ext}`);
+      } catch (error) {
+        console.error("Error creating layout file:", error.message);
+      }
       // Scaffold .env.local
       try {
         const envPath = path.join(projectPath, ".env.local");
