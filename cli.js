@@ -204,6 +204,32 @@ async function run() {
         );
       } catch (error) {}
 
+      // Create routes directory and Routes file if React Router is selected
+      if (packages.includes("React Router")) {
+        try {
+          const routesDir = path.join(projectPath, "src", "routes");
+          if (!fs.existsSync(routesDir)) {
+            fs.mkdirSync(routesDir);
+          }
+          const routesPath = path.join(
+            routesDir,
+            `Routes.${language === "JavaScript" ? "jsx" : "tsx"}`
+          );
+          fs.writeFileSync(
+            routesPath,
+            `import { createBrowserRouter } from "react-router-dom";
+import Home from "../pages/Home${language === "JavaScript" ? ".jsx" : ".tsx"}";
+
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+]);`
+          );
+        } catch (error) {}
+      }
+
       try {
         const appJsxPath = path.join(
           projectPath,
@@ -213,7 +239,9 @@ async function run() {
         if (fs.existsSync(appJsxPath)) {
           try {
             const appContent = packages.includes("React Router")
-              ? `import { Outlet } from "react-router-dom";\nimport Navbar from "./components/Navbar";\nimport Footer from "./components/Footer";\n\nexport default function App() {\n  return (\n    <>\n      <Navbar/>\n      <Outlet/>\n      <Footer/>\n    </>\n  );\n}`
+              ? `import { RouterProvider } from "react-router-dom";\nimport { router } from "./routes/Routes${
+                  language === "JavaScript" ? ".jsx" : ".tsx"
+                }";\n\nfunction App() {\n  return (\n    <>\n      <RouterProvider router={router} />\n    </>\n  );\n}\n\nexport default App;`
               : `import Navbar from "./components/Navbar";\nimport Home from "./pages/Home";\nimport Footer from "./components/Footer";\n\nexport default function App() {\n  return (\n    <>\n      <Navbar/>\n      <Footer/>\n    </>\n  );\n}`;
             fs.writeFileSync(appJsxPath, appContent);
           } catch (error) {}
@@ -268,19 +296,6 @@ async function run() {
           if (packages.includes("React Router")) {
             try {
               execSync("npm i react-router-dom", { stdio: "inherit" });
-              const mainFilePath = path.join(
-                projectPath,
-                "src",
-                `main.${language === "JavaScript" ? "jsx" : "tsx"}`
-              );
-              if (fs.existsSync(mainFilePath)) {
-                fs.writeFileSync(
-                  mainFilePath,
-                  `import { StrictMode } from "react";\nimport { createRoot } from "react-dom/client";\nimport "./index.css";\nimport App from "./App${
-                    language === "JavaScript" ? ".jsx" : ".tsx"
-                  }";\nimport { createBrowserRouter, RouterProvider } from "react-router-dom";\nimport Home from "./pages/Home.jsx"\n\nconst router = createBrowserRouter([\n  {\n    path: "/",\n    Component: App,\n    children: [\n    {index: true, Component: Home}\n    ]\n  },\n]);\n\ncreateRoot(document.getElementById("root")).render(\n  <StrictMode>\n    <RouterProvider router={router}></RouterProvider>\n  </StrictMode>\n);\n`
-                );
-              }
             } catch (error) {}
           }
           if (packages.includes("OGL")) {
@@ -379,7 +394,7 @@ async function run() {
           type: "confirm",
           name: "srcDir",
           message: "Would you like your code inside a 'src/' directory?",
-          default: true,
+          default: false,
         },
         {
           type: "confirm",
