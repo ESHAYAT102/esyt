@@ -14,8 +14,11 @@ You can use `esyt` with any of these package managers:
 # Using npm
 npm create esyt@latest
 
+# Using bun
+bun create esyt@latest
+
 # Using pnpm
-pnpm create esyt
+pnpm create esyt@latest
 ```
 
 ## Features
@@ -103,4 +106,3 @@ Eshayat Al-Wasiu
 
 - Homepage: [https://esyt.eshayat.com](https://esyt.eshayat.com)
 - Repository: [https://github.com/ESHAYAT102/esyt](https://github.com/ESHAYAT102/esyt)
-- Issues: [https://github.com/ESHAYAT102/esyt/issues](https://github.com/ESHAYAT102/esyt/issues)
