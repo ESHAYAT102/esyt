@@ -4,6 +4,64 @@ import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
 
+function detectPackageManager() {
+  const userAgent = process.env.npm_config_user_agent || "";
+
+  const isBun =
+    /bun/i.test(userAgent) ||
+    process.env.BUN ||
+    (process.versions && process.versions.bun);
+  const isPnpm =
+    /pnpm\//i.test(userAgent) ||
+    (process.env.npm_execpath || "").includes("pnpm");
+
+  if (isBun) {
+    return {
+      name: "bun",
+      installCmd: "bun install",
+      addCmd: "bun add",
+      addDevCmd: "bun add -d",
+      dlxCmd: "bunx",
+      createViteCmd(projectName, template) {
+        return `bun create vite@latest ${projectName} --template ${template}`;
+      },
+      createNextCmd(projectName, flags) {
+        return `bunx create-next-app@latest ${projectName} ${flags}`;
+      },
+    };
+  }
+
+  if (isPnpm) {
+    return {
+      name: "pnpm",
+      installCmd: "pnpm i",
+      addCmd: "pnpm add",
+      addDevCmd: "pnpm add -D",
+      dlxCmd: "pnpm dlx",
+      createViteCmd(projectName, template) {
+        return `pnpm create vite@latest ${projectName} --template ${template}`;
+      },
+      createNextCmd(projectName, flags) {
+        return `pnpm create next-app@latest ${projectName} ${flags}`;
+      },
+    };
+  }
+
+  return {
+    name: "npm",
+    installCmd: "npm i",
+    addCmd: "npm i",
+    addDevCmd: "npm i -D",
+    dlxCmd: "npx",
+    createViteCmd(projectName, template) {
+      return `npm create vite@latest ${projectName} -- --template ${template}`;
+    },
+    createNextCmd(projectName, flags) {
+      return `npx create-next-app@latest ${projectName} ${flags}`;
+    },
+  };
+}
+
 function printTitle() {
   console.log(`ESYT CLI`);
 }
@@ -11,6 +69,7 @@ function printTitle() {
 async function run() {
   try {
     printTitle();
+    const pm = detectPackageManager();
 
     // 1. Framework selection prompt
     const { framework } = await inquirer.prompt([
@@ -103,7 +162,7 @@ async function run() {
       {
         type: "confirm",
         name: "installDeps",
-        message: "Would you like us to run 'npm i'?",
+        message: `Would you like us to run '${pm.installCmd}'?`,
         default: true,
       },
       {
@@ -133,17 +192,16 @@ async function run() {
 
     // --- Framework-specific project creation ---
     if (framework === "Vite") {
-      console.log("Running: npm create vite@latest");
-      let viteCommand = `npm create vite@latest ${projectName} -- --template `;
-      viteCommand += language === "JavaScript" ? "react" : "react-ts";
-
+      const template = language === "JavaScript" ? "react" : "react-ts";
+      const viteCommand = pm.createViteCmd(projectName, template);
+      console.log(`Running: ${viteCommand}`);
       execSync(viteCommand, { stdio: "inherit" });
 
       process.chdir(projectPath);
 
       try {
         if (installDeps) {
-          execSync("npm i", { stdio: "inherit" });
+          execSync(pm.installCmd, { stdio: "inherit" });
         }
       } catch (error) {
         console.error("Error during initial setup:", error.message);
@@ -263,49 +321,49 @@ export const router = createBrowserRouter([
         try {
           if (packages.includes("Clerk")) {
             try {
-              execSync("npm i @clerk/clerk-react --save", { stdio: "inherit" });
+              execSync(`${pm.addCmd} @clerk/clerk-react`, { stdio: "inherit" });
             } catch (error) {}
           }
           if (packages.includes("Appwrite")) {
             try {
-              execSync("npm i appwrite", { stdio: "inherit" });
+              execSync(`${pm.addCmd} appwrite`, { stdio: "inherit" });
             } catch (error) {}
           }
           if (packages.includes("Prisma")) {
             try {
-              execSync("npm i prisma --save-dev", { stdio: "inherit" });
-              execSync("npm i @prisma/client", { stdio: "inherit" });
+              execSync(`${pm.addDevCmd} prisma`, { stdio: "inherit" });
+              execSync(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
               execSync(
-                "npx prisma@latest init --datasource-provider postgresql",
-                {
-                  stdio: "inherit",
-                }
+                `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
+                { stdio: "inherit" }
               );
             } catch (error) {}
           }
           if (packages.includes("React Icons")) {
             try {
-              execSync("npm i react-icons", { stdio: "inherit" });
+              execSync(`${pm.addCmd} react-icons`, { stdio: "inherit" });
             } catch (error) {}
           }
           if (packages.includes("Framer Motion")) {
             try {
-              execSync("npm i framer-motion motion", { stdio: "inherit" });
+              execSync(`${pm.addCmd} framer-motion motion`, {
+                stdio: "inherit",
+              });
             } catch (error) {}
           }
           if (packages.includes("React Router")) {
             try {
-              execSync("npm i react-router-dom", { stdio: "inherit" });
+              execSync(`${pm.addCmd} react-router-dom`, { stdio: "inherit" });
             } catch (error) {}
           }
           if (packages.includes("OGL")) {
             try {
-              execSync("npm i ogl", { stdio: "inherit" });
+              execSync(`${pm.addCmd} ogl`, { stdio: "inherit" });
             } catch (error) {}
           }
           if (packages.includes("Firebase")) {
             try {
-              execSync("npm i firebase", { stdio: "inherit" });
+              execSync(`${pm.addCmd} firebase`, { stdio: "inherit" });
               const firebaseDir = path.join(projectPath, "src", "firebase");
               if (!fs.existsSync(firebaseDir)) {
                 fs.mkdirSync(firebaseDir, { recursive: true });
@@ -327,17 +385,17 @@ export const router = createBrowserRouter([
           }
           if (packages.includes("DotENV")) {
             try {
-              execSync("npm i dotenv", { stdio: "inherit" });
+              execSync(`${pm.addCmd} dotenv`, { stdio: "inherit" });
             } catch (error) {}
           }
           if (packages.includes("Axios")) {
             try {
-              execSync("npm i axios", { stdio: "inherit" });
+              execSync(`${pm.addCmd} axios`, { stdio: "inherit" });
             } catch (error) {}
           }
           if (packages.includes("TailwindCSS")) {
             try {
-              execSync("npm install tailwindcss @tailwindcss/vite", {
+              execSync(`${pm.addCmd} tailwindcss @tailwindcss/vite`, {
                 stdio: "inherit",
               });
               const indexCssPath = path.join(projectPath, "src", "index.css");
@@ -412,22 +470,26 @@ export const router = createBrowserRouter([
       // Tailwind CSS autofill
       const useTailwind = packages.includes("TailwindCSS");
       // --- Next.js project creation ---
-      console.log("Running: npx create-next-app@latest");
-      let nextCommand = `npx create-next-app@latest ${projectName}`;
+      const nextFlagsParts = [];
       // Set language flag for Next.js
       if (language === "TypeScript") {
-        nextCommand += " --ts";
+        nextFlagsParts.push("--ts");
       } else {
-        nextCommand += " --js";
+        nextFlagsParts.push("--js");
       }
-      nextCommand += nextOptions.eslint ? " --eslint" : " --no-eslint";
-      nextCommand += useTailwind ? " --tailwind" : " --no-tailwind";
-      nextCommand += nextOptions.srcDir ? " --src-dir" : " --no-src-dir";
-      nextCommand += nextOptions.appRouter ? " --app" : " --no-app";
+      nextFlagsParts.push(nextOptions.eslint ? "--eslint" : "--no-eslint");
+      nextFlagsParts.push(useTailwind ? "--tailwind" : "--no-tailwind");
+      nextFlagsParts.push(nextOptions.srcDir ? "--src-dir" : "--no-src-dir");
+      nextFlagsParts.push(nextOptions.appRouter ? "--app" : "--no-app");
       // Add Turbopack flags only if selected, per official docs (Made the import alias static to yes as it was not possible to automate for no)
       if (nextOptions.turbo) {
-        nextCommand += ' --turbopack --import-alias "@/*"';
+        nextFlagsParts.push("--turbopack", '--import-alias "@/*"');
       }
+      const nextCommand = pm.createNextCmd(
+        projectName,
+        nextFlagsParts.join(" ")
+      );
+      console.log(`Running: ${nextCommand}`);
       execSync(nextCommand, { stdio: "inherit" });
       console.log("Next.js project created.");
       process.chdir(projectPath);
@@ -442,7 +504,7 @@ export const router = createBrowserRouter([
       try {
         if (installDeps) {
           console.log("Installing initial dependencies...");
-          execSync("npm i", { stdio: "inherit" });
+          execSync(pm.installCmd, { stdio: "inherit" });
         } else {
           console.log(
             "Skipping initial dependencies installation as requested."
@@ -597,7 +659,7 @@ export default function RootLayout({
               case "TailwindCSS":
                 // For Next.js, install tailwindcss, @tailwindcss/postcss, postcss
                 execSync(
-                  "npm install tailwindcss @tailwindcss/postcss postcss",
+                  `${pm.addCmd} tailwindcss @tailwindcss/postcss postcss`,
                   { stdio: "inherit" }
                 );
                 // Write postcss.config.mjs
@@ -620,48 +682,48 @@ export default function RootLayout({
                 fs.writeFileSync(globalsCssPath, '@import "tailwindcss";\n');
                 break;
               case "React Icons":
-                execSync("npm i react-icons", { stdio: "inherit" });
+                execSync(`${pm.addCmd} react-icons`, { stdio: "inherit" });
                 break;
               case "Framer Motion":
-                execSync("npm i framer-motion", { stdio: "inherit" });
+                execSync(`${pm.addCmd} framer-motion`, { stdio: "inherit" });
                 break;
               case "DotENV":
-                execSync("npm i dotenv", { stdio: "inherit" });
+                execSync(`${pm.addCmd} dotenv`, { stdio: "inherit" });
                 break;
               case "Axios":
-                execSync("npm i axios", { stdio: "inherit" });
+                execSync(`${pm.addCmd} axios`, { stdio: "inherit" });
                 break;
               case "Firebase":
-                execSync("npm i firebase", { stdio: "inherit" });
+                execSync(`${pm.addCmd} firebase`, { stdio: "inherit" });
                 break;
               case "Clerk":
-                execSync("npm i @clerk/nextjs", { stdio: "inherit" });
+                execSync(`${pm.addCmd} @clerk/nextjs`, { stdio: "inherit" });
                 break;
               case "Appwrite":
-                execSync("npm i appwrite", { stdio: "inherit" });
+                execSync(`${pm.addCmd} appwrite`, { stdio: "inherit" });
                 break;
               case "Prisma":
-                execSync("npm i prisma --save-dev", { stdio: "inherit" });
-                execSync("npm i @prisma/client", { stdio: "inherit" });
+                execSync(`${pm.addDevCmd} prisma`, { stdio: "inherit" });
+                execSync(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
                 execSync(
-                  "npx prisma@latest init --datasource-provider postgresql",
+                  `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
                   { stdio: "inherit" }
                 );
                 break;
               case "next-auth":
-                execSync("npm i next-auth", { stdio: "inherit" });
+                execSync(`${pm.addCmd} next-auth`, { stdio: "inherit" });
                 break;
               case "@next/font":
-                execSync("npm i @next/font", { stdio: "inherit" });
+                execSync(`${pm.addCmd} @next/font`, { stdio: "inherit" });
                 break;
               case "next-seo":
-                execSync("npm i next-seo", { stdio: "inherit" });
+                execSync(`${pm.addCmd} next-seo`, { stdio: "inherit" });
                 break;
               case "next-sitemap":
-                execSync("npm i next-sitemap", { stdio: "inherit" });
+                execSync(`${pm.addCmd} next-sitemap`, { stdio: "inherit" });
                 break;
               case "next-pwa":
-                execSync("npm i next-pwa", { stdio: "inherit" });
+                execSync(`${pm.addCmd} next-pwa`, { stdio: "inherit" });
                 break;
             }
             console.log(`✅ ${pkg} installed.`);
