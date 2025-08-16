@@ -62,20 +62,20 @@ Just run one of the installation commands above and follow the interactive promp
 ## Example
 
 ```bash
-$ npm create esyt
-? Which framework would you like to use? Next.js
-? Will you be using JavaScript or TypeScript? TypeScript
-? What will your project be called? my-next-app
-? Which packages would you like to enable? TailwindCSS, next-auth, Prisma
-? Would you like to use ESLint? Yes
-? Would you like your code inside a 'src/' directory? Yes
-? Would you like to use App Router? Yes
-? Would you like to use Turbopack for 'next dev'? Yes
-? Would you like to customize the import alias (@/* by default)? Yes
-? Initialize a new git repository? No
-? Would you like us to run 'npm i'? Yes
-? Would you like to run the development server automatically after setup? No
-? Which IDE would you like to open your project with? None
+$ bun create esyt@latest
+
+> npx
+> esyt
+
+ESYT CLI
+✔ Which framework would you like to use? Vite
+✔ Will you be using JavaScript or TypeScript? TypeScript
+✔ What will your project be called? esyt-app
+✔ Which packages would you like to enable? TailwindCSS, React Router, DotENV
+✔ Initialize a new git repository? Yes
+✔ Would you like us to run 'bun install'? Yes
+✔ Which IDE would you like to open your project with? None
+✔ Would you like to run the developmen t server automatically after setup? Yes
 ```
 
 ## What's Included
