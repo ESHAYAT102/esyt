@@ -64,10 +64,12 @@ Just run one of the installation commands above and follow the interactive promp
 ```bash
 $ bun create esyt@latest
 
-> npx
-> esyt
+ ______     ______     __  __     ______
+/\  ___\   /\  ___\   /\ \_\ \   /\__  _\
+\ \  __\   \ \___  \  \ \____ \  \/_/\ \/
+ \ \_____\  \/\_____\  \/\_____\    \ \_\
+  \/_____/   \/_____/   \/_____/     \/_/
 
-ESYT CLI
 ✔ Which framework would you like to use? Vite
 ✔ Will you be using JavaScript or TypeScript? TypeScript
 ✔ What will your project be called? esyt-app
