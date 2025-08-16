@@ -800,6 +800,25 @@ export default function RootLayout({
     } catch (error) {
       console.error("Error during IDE launch:", error.message);
     }
+
+    // Run dev server if selected
+    if (runDevServer) {
+      try {
+        console.log(`\nStarting development server with ${pm.name}...`);
+        // Change to project directory
+        process.chdir(projectPath);
+        // Run the dev server command
+        execSync(`${pm.name} run dev`, { stdio: "inherit" });
+      } catch (error) {
+        console.error(
+          `❌ Failed to start development server: ${error.message}`
+        );
+        console.log(
+          `You can manually start it by running '${pm.name} run dev' in your project directory.`
+        );
+      }
+    }
+
     console.log("\n✨ Project setup complete! ✨");
   } catch (error) {
     console.error(
