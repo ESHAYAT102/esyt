@@ -1,5 +1,31 @@
 #!/usr/bin/env node
-import inquirer from "inquirer";
+// Attempt to dynamically load `figures` and override the tick symbol.
+// Do this before importing `inquirer` so when inquirer loads, it will
+// pick up the modified symbol. If `figures` isn't available in the
+// environment where this script runs (for example when `bun create`
+// executes a temporary package), we silently continue.
+let inquirer;
+try {
+  // Top-level await is supported in modern Node; use dynamic import so missing
+  // `figures` doesn't cause a hard crash.
+  const figMod = await import("figures").catch(() => null);
+  if (figMod) {
+    const figures = figMod.default || figMod;
+    try {
+      if (figures && typeof figures === "object") {
+        figures.tick = "→ ";
+      }
+    } catch (e) {
+      // ignore if unable to set
+    }
+  }
+  const inquirerMod = await import("inquirer");
+  inquirer = inquirerMod.default || inquirerMod;
+} catch (err) {
+  // If dynamic import of inquirer fails for whatever reason, rethrow so the
+  // existing error handling higher up can catch and report it.
+  throw err;
+}
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
@@ -201,7 +227,20 @@ async function run() {
       const template = language === "JavaScript" ? "react" : "react-ts";
       const viteCommand = pm.createViteCmd(projectName, template);
       console.log(`Running: ${viteCommand}`);
-      execSync(viteCommand, { stdio: "inherit" });
+      // Newer versions of the Vite create flow ask interactive questions
+      // (e.g. "Use rolldown-vite (Experimental)?" and "Install with bun and start now?").
+      // Auto-answer these prompts with "no" by sending two "no\n" lines to stdin.
+      // We keep stdout/stderr inherited so the user still sees the command output.
+      try {
+        execSync(viteCommand, {
+          stdio: ["pipe", "inherit", "inherit"],
+          input: Buffer.from("no\nno\n"),
+        });
+      } catch (err) {
+        // If the command fails for any reason, surface the error and rethrow
+        // so the surrounding error handling can pick it up.
+        throw err;
+      }
 
       process.chdir(projectPath);
 
@@ -240,10 +279,10 @@ async function run() {
               } else {
                 fs.unlinkSync(file.path);
               }
-            } catch (error) {}
+            } catch (error) { }
           }
         }
-      } catch (error) {}
+      } catch (error) { }
 
       try {
         const componentsDir = path.join(projectPath, "src", "components");
@@ -266,7 +305,7 @@ async function run() {
           footerPath,
           `export default function Footer() {\n  return (\n    <>\n      <h1>Footer</h1>\n    </>\n  )\n}`
         );
-      } catch (error) {}
+      } catch (error) { }
 
       // Create routes directory and Routes file if React Router is selected
       if (packages.includes("React Router")) {
@@ -291,7 +330,7 @@ export const router = createBrowserRouter([
   },
 ]);`
           );
-        } catch (error) {}
+        } catch (error) { }
       }
 
       try {
@@ -303,37 +342,35 @@ export const router = createBrowserRouter([
         if (fs.existsSync(appJsxPath)) {
           try {
             const appContent = packages.includes("React Router")
-              ? `import { RouterProvider } from "react-router-dom";\nimport { router } from "./routes/Routes${
-                  language === "JavaScript" ? ".jsx" : ".tsx"
-                }";\n\nfunction App() {\n  return (\n    <>\n      <RouterProvider router={router} />\n    </>\n  );\n}\n\nexport default App;`
+              ? `import { RouterProvider } from "react-router-dom";\nimport { router } from "./routes/Routes${language === "JavaScript" ? ".jsx" : ".tsx"
+              }";\n\nfunction App() {\n  return (\n    <>\n      <RouterProvider router={router} />\n    </>\n  );\n}\n\nexport default App;`
               : `import Navbar from "./components/Navbar";\nimport Home from "./pages/Home";\nimport Footer from "./components/Footer";\n\nexport default function App() {\n  return (\n    <>\n      <Navbar/>\n      <Footer/>\n    </>\n  );\n}`;
             fs.writeFileSync(appJsxPath, appContent);
-          } catch (error) {}
+          } catch (error) { }
         }
         const indexHtmlPath = path.join(projectPath, "index.html");
         if (fs.existsSync(indexHtmlPath)) {
           try {
             fs.writeFileSync(
               indexHtmlPath,
-              `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${
-                language === "JavaScript" ? "jsx" : "tsx"
+              `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${language === "JavaScript" ? "jsx" : "tsx"
               }\"></script>\n  </body>\n</html>\n`
             );
-          } catch (error) {}
+          } catch (error) { }
         }
-      } catch (error) {}
+      } catch (error) { }
 
       if (installDeps) {
         try {
           if (packages.includes("Clerk")) {
             try {
               execSync(`${pm.addCmd} @clerk/clerk-react`, { stdio: "inherit" });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("Appwrite")) {
             try {
               execSync(`${pm.addCmd} appwrite`, { stdio: "inherit" });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("Prisma")) {
             try {
@@ -343,29 +380,29 @@ export const router = createBrowserRouter([
                 `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
                 { stdio: "inherit" }
               );
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("React Icons")) {
             try {
               execSync(`${pm.addCmd} react-icons`, { stdio: "inherit" });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("Framer Motion")) {
             try {
               execSync(`${pm.addCmd} framer-motion motion`, {
                 stdio: "inherit",
               });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("React Router")) {
             try {
               execSync(`${pm.addCmd} react-router-dom`, { stdio: "inherit" });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("OGL")) {
             try {
               execSync(`${pm.addCmd} ogl`, { stdio: "inherit" });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("Firebase")) {
             try {
@@ -387,17 +424,17 @@ export const router = createBrowserRouter([
                 envPath,
                 `VITE_FIREBASE_API_KEY=\nVITE_FIREBASE_AUTH_DOMAIN=\nVITE_FIREBASE_PROJECT_ID=\nVITE_FIREBASE_STORAGE_BUCKET=\nVITE_FIREBASE_APP_ID=\nVITE_SERVER_URL=`
               );
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("DotENV")) {
             try {
               execSync(`${pm.addCmd} dotenv`, { stdio: "inherit" });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("Axios")) {
             try {
               execSync(`${pm.addCmd} axios`, { stdio: "inherit" });
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("TailwindCSS")) {
             try {
@@ -419,7 +456,7 @@ export const router = createBrowserRouter([
                     `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`
                   );
                 }
-              } catch (error) {}
+              } catch (error) { }
               const viteConfigPath = path.join(projectPath, "vite.config.js");
               if (fs.existsSync(viteConfigPath)) {
                 fs.writeFileSync(
@@ -427,9 +464,9 @@ export const router = createBrowserRouter([
                   `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`
                 );
               }
-            } catch (error) {}
+            } catch (error) { }
           }
-        } catch (error) {}
+        } catch (error) { }
       }
       try {
         const pagesDir = path.join(projectPath, "src", "pages");
@@ -444,7 +481,7 @@ export const router = createBrowserRouter([
           homePath,
           `export default function Home() {\n  return (\n    <>\n      <h1>Home</h1>\n    </>\n  )\n}`
         );
-      } catch (error) {}
+      } catch (error) { }
     } else if (framework === "Next.js") {
       // --- Next.js extra options prompt ---
       const nextOptions = await inquirer.prompt([
@@ -505,7 +542,7 @@ export const router = createBrowserRouter([
         if (fs.existsSync(readmePath)) {
           fs.unlinkSync(readmePath);
         }
-      } catch (error) {}
+      } catch (error) { }
       console.log(`Changed directory to: ${projectName}`);
       try {
         if (installDeps) {
@@ -585,8 +622,8 @@ export const router = createBrowserRouter([
           language === "TypeScript"
             ? "tsx"
             : language === "JavaScript"
-            ? "jsx"
-            : "js";
+              ? "jsx"
+              : "js";
         const layoutFile = path.join(baseAppDir, `layout.${ext}`);
         const layoutCode = `import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
