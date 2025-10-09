@@ -90,11 +90,11 @@ function detectPackageManager() {
 
 function printTitle() {
   console.log(`
- ______     ______     __  __     ______  
-/\\  ___\\   /\\  ___\\   /\\ \\_\\ \\   /\\__  _\\ 
-\\ \\  __\\   \\ \\___  \\  \\ \\____ \\  \\/_/\\ \\/ 
- \\ \\_____\\  \\/\\_____\\  \\/\\_____\\    \\ \\_\\ 
-  \\/_____/   \\/_____/   \\/_____/     \\/_/ 
+ ______     ______     __  __     ______
+/\\  ___\\   /\\  ___\\   /\\ \\_\\ \\   /\\__  _\\
+\\ \\  __\\   \\ \\___  \\  \\ \\____ \\  \\/_/\\ \\/
+ \\ \\_____\\  \\/\\_____\\  \\/\\_____\\    \\ \\_\\
+  \\/_____/   \\/_____/   \\/_____/     \\/_/
 `);
 }
 
@@ -201,7 +201,7 @@ async function run() {
         type: "list",
         name: "selectedIDE",
         message: "Which IDE would you like to open your project with?",
-        choices: ["VSCode", "Cursor", "Trae", "None"],
+        choices: ["Zed", "VSCode", "Cursor", "Trae", "None"],
         default: "None",
       },
     ]);
@@ -279,10 +279,10 @@ async function run() {
               } else {
                 fs.unlinkSync(file.path);
               }
-            } catch (error) { }
+            } catch (error) {}
           }
         }
-      } catch (error) { }
+      } catch (error) {}
 
       try {
         const componentsDir = path.join(projectPath, "src", "components");
@@ -291,21 +291,21 @@ async function run() {
         }
         const navbarPath = path.join(
           componentsDir,
-          `Navbar.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `Navbar.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         fs.writeFileSync(
           navbarPath,
-          `export default function Navbar() {\n  return (\n    <>\n      <h1>Navbar</h1>\n    </>\n  )\n}`
+          `export default function Navbar() {\n  return (\n    <>\n      <h1>Navbar</h1>\n    </>\n  )\n}`,
         );
         const footerPath = path.join(
           componentsDir,
-          `Footer.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `Footer.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         fs.writeFileSync(
           footerPath,
-          `export default function Footer() {\n  return (\n    <>\n      <h1>Footer</h1>\n    </>\n  )\n}`
+          `export default function Footer() {\n  return (\n    <>\n      <h1>Footer</h1>\n    </>\n  )\n}`,
         );
-      } catch (error) { }
+      } catch (error) {}
 
       // Create routes directory and Routes file if React Router is selected
       if (packages.includes("React Router")) {
@@ -316,7 +316,7 @@ async function run() {
           }
           const routesPath = path.join(
             routesDir,
-            `Routes.${language === "JavaScript" ? "jsx" : "tsx"}`
+            `Routes.${language === "JavaScript" ? "jsx" : "tsx"}`,
           );
           fs.writeFileSync(
             routesPath,
@@ -328,49 +328,51 @@ export const router = createBrowserRouter([
     path: "/",
     element: <Home />,
   },
-]);`
+]);`,
           );
-        } catch (error) { }
+        } catch (error) {}
       }
 
       try {
         const appJsxPath = path.join(
           projectPath,
           "src",
-          `App.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `App.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         if (fs.existsSync(appJsxPath)) {
           try {
             const appContent = packages.includes("React Router")
-              ? `import { RouterProvider } from "react-router-dom";\nimport { router } from "./routes/Routes${language === "JavaScript" ? ".jsx" : ".tsx"
-              }";\n\nfunction App() {\n  return (\n    <>\n      <RouterProvider router={router} />\n    </>\n  );\n}\n\nexport default App;`
+              ? `import { RouterProvider } from "react-router-dom";\nimport { router } from "./routes/Routes${
+                  language === "JavaScript" ? ".jsx" : ".tsx"
+                }";\n\nfunction App() {\n  return (\n    <>\n      <RouterProvider router={router} />\n    </>\n  );\n}\n\nexport default App;`
               : `import Navbar from "./components/Navbar";\nimport Home from "./pages/Home";\nimport Footer from "./components/Footer";\n\nexport default function App() {\n  return (\n    <>\n      <Navbar/>\n      <Footer/>\n    </>\n  );\n}`;
             fs.writeFileSync(appJsxPath, appContent);
-          } catch (error) { }
+          } catch (error) {}
         }
         const indexHtmlPath = path.join(projectPath, "index.html");
         if (fs.existsSync(indexHtmlPath)) {
           try {
             fs.writeFileSync(
               indexHtmlPath,
-              `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${language === "JavaScript" ? "jsx" : "tsx"
-              }\"></script>\n  </body>\n</html>\n`
+              `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${
+                language === "JavaScript" ? "jsx" : "tsx"
+              }\"></script>\n  </body>\n</html>\n`,
             );
-          } catch (error) { }
+          } catch (error) {}
         }
-      } catch (error) { }
+      } catch (error) {}
 
       if (installDeps) {
         try {
           if (packages.includes("Clerk")) {
             try {
               execSync(`${pm.addCmd} @clerk/clerk-react`, { stdio: "inherit" });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("Appwrite")) {
             try {
               execSync(`${pm.addCmd} appwrite`, { stdio: "inherit" });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("Prisma")) {
             try {
@@ -378,31 +380,31 @@ export const router = createBrowserRouter([
               execSync(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
               execSync(
                 `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
-                { stdio: "inherit" }
+                { stdio: "inherit" },
               );
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("React Icons")) {
             try {
               execSync(`${pm.addCmd} react-icons`, { stdio: "inherit" });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("Framer Motion")) {
             try {
               execSync(`${pm.addCmd} framer-motion motion`, {
                 stdio: "inherit",
               });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("React Router")) {
             try {
               execSync(`${pm.addCmd} react-router-dom`, { stdio: "inherit" });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("OGL")) {
             try {
               execSync(`${pm.addCmd} ogl`, { stdio: "inherit" });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("Firebase")) {
             try {
@@ -413,28 +415,28 @@ export const router = createBrowserRouter([
               }
               const firebaseConfigPath = path.join(
                 firebaseDir,
-                "firebase.config.js"
+                "firebase.config.js",
               );
               fs.writeFileSync(
                 firebaseConfigPath,
-                `import { initializeApp } from "firebase/app";\nimport { getAuth } from "firebase/auth";\n\nconst firebaseConfig = {\n  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,\n  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,\n  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,\n  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,\n  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,\n  appId: import.meta.env.VITE_FIREBASE_APP_ID,\n};\n\nconst app = initializeApp(firebaseConfig);\nexport const auth = getAuth(app);`
+                `import { initializeApp } from "firebase/app";\nimport { getAuth } from "firebase/auth";\n\nconst firebaseConfig = {\n  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,\n  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,\n  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,\n  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,\n  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,\n  appId: import.meta.env.VITE_FIREBASE_APP_ID,\n};\n\nconst app = initializeApp(firebaseConfig);\nexport const auth = getAuth(app);`,
               );
               const envPath = path.join(projectPath, ".env");
               fs.writeFileSync(
                 envPath,
-                `VITE_FIREBASE_API_KEY=\nVITE_FIREBASE_AUTH_DOMAIN=\nVITE_FIREBASE_PROJECT_ID=\nVITE_FIREBASE_STORAGE_BUCKET=\nVITE_FIREBASE_APP_ID=\nVITE_SERVER_URL=`
+                `VITE_FIREBASE_API_KEY=\nVITE_FIREBASE_AUTH_DOMAIN=\nVITE_FIREBASE_PROJECT_ID=\nVITE_FIREBASE_STORAGE_BUCKET=\nVITE_FIREBASE_APP_ID=\nVITE_SERVER_URL=`,
               );
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("DotENV")) {
             try {
               execSync(`${pm.addCmd} dotenv`, { stdio: "inherit" });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("Axios")) {
             try {
               execSync(`${pm.addCmd} axios`, { stdio: "inherit" });
-            } catch (error) { }
+            } catch (error) {}
           }
           if (packages.includes("TailwindCSS")) {
             try {
@@ -447,26 +449,26 @@ export const router = createBrowserRouter([
               }
               const tailwindConfigPath = path.join(
                 projectPath,
-                "tailwind.config.js"
+                "tailwind.config.js",
               );
               try {
                 if (!fs.existsSync(tailwindConfigPath)) {
                   fs.writeFileSync(
                     tailwindConfigPath,
-                    `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`
+                    `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`,
                   );
                 }
-              } catch (error) { }
+              } catch (error) {}
               const viteConfigPath = path.join(projectPath, "vite.config.js");
               if (fs.existsSync(viteConfigPath)) {
                 fs.writeFileSync(
                   viteConfigPath,
-                  `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`
+                  `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`,
                 );
               }
-            } catch (error) { }
+            } catch (error) {}
           }
-        } catch (error) { }
+        } catch (error) {}
       }
       try {
         const pagesDir = path.join(projectPath, "src", "pages");
@@ -475,13 +477,13 @@ export const router = createBrowserRouter([
         }
         const homePath = path.join(
           pagesDir,
-          `Home.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `Home.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         fs.writeFileSync(
           homePath,
-          `export default function Home() {\n  return (\n    <>\n      <h1>Home</h1>\n    </>\n  )\n}`
+          `export default function Home() {\n  return (\n    <>\n      <h1>Home</h1>\n    </>\n  )\n}`,
         );
-      } catch (error) { }
+      } catch (error) {}
     } else if (framework === "Next.js") {
       // --- Next.js extra options prompt ---
       const nextOptions = await inquirer.prompt([
@@ -530,7 +532,7 @@ export const router = createBrowserRouter([
       }
       const nextCommand = pm.createNextCmd(
         projectName,
-        nextFlagsParts.join(" ")
+        nextFlagsParts.join(" "),
       );
       console.log(`Running: ${nextCommand}`);
       execSync(nextCommand, { stdio: "inherit" });
@@ -542,7 +544,7 @@ export const router = createBrowserRouter([
         if (fs.existsSync(readmePath)) {
           fs.unlinkSync(readmePath);
         }
-      } catch (error) { }
+      } catch (error) {}
       console.log(`Changed directory to: ${projectName}`);
       try {
         if (installDeps) {
@@ -550,7 +552,7 @@ export const router = createBrowserRouter([
           execSync(pm.installCmd, { stdio: "inherit" });
         } else {
           console.log(
-            "Skipping initial dependencies installation as requested."
+            "Skipping initial dependencies installation as requested.",
           );
         }
       } catch (error) {
@@ -577,15 +579,15 @@ export const router = createBrowserRouter([
         const navbarPath = path.join(componentsDir, `Navbar.${ext}`);
         fs.writeFileSync(
           navbarPath,
-          `export default function Navbar() {\n  return (\n    <nav className="p-16 border-b border-slate-200">\n      <h1>Navbar</h1>\n    </nav>\n  )\n}`
+          `export default function Navbar() {\n  return (\n    <nav className="p-16 border-b border-slate-200">\n      <h1>Navbar</h1>\n    </nav>\n  )\n}`,
         );
         const footerPath = path.join(componentsDir, `Footer.${ext}`);
         fs.writeFileSync(
           footerPath,
-          `export default function Footer() {\n  return (\n    <footer className="p-16 border-t border-slate-200">\n      <h1>Footer</h1>\n    </footer>\n  )\n}`
+          `export default function Footer() {\n  return (\n    <footer className="p-16 border-t border-slate-200">\n      <h1>Footer</h1>\n    </footer>\n  )\n}`,
         );
         console.log(
-          "Created Navbar and Footer components inside app/components."
+          "Created Navbar and Footer components inside app/components.",
         );
       } catch (error) {
         console.error("Error creating components:", error.message);
@@ -598,13 +600,13 @@ export const router = createBrowserRouter([
         }
         const apiFile = path.join(
           apiDir,
-          `hello.${language === "JavaScript" ? "js" : "ts"}`
+          `hello.${language === "JavaScript" ? "js" : "ts"}`,
         );
         fs.writeFileSync(
           apiFile,
           language === "JavaScript"
             ? `export default function handler(req, res) {\n  res.status(200).json({ message: 'Hello from Next.js API!' });\n}`
-            : `import { NextApiRequest, NextApiResponse } from 'next';\nexport default function handler(req: NextApiRequest, res: NextApiResponse) {\n  res.status(200).json({ message: 'Hello from Next.js API!' });\n}`
+            : `import { NextApiRequest, NextApiResponse } from 'next';\nexport default function handler(req: NextApiRequest, res: NextApiResponse) {\n  res.status(200).json({ message: 'Hello from Next.js API!' });\n}`,
         );
         console.log("Created sample API route.");
       } catch (error) {
@@ -687,7 +689,7 @@ export default function RootLayout({
         const mainPageFile = path.join(baseAppDir, `page.${ext}`);
         fs.writeFileSync(
           mainPageFile,
-          `export default function Home() {\n  return (\n    <div>\n      <h1>ESYT</h1>\n    </div>\n  );\n}`
+          `export default function Home() {\n  return (\n    <div>\n      <h1>ESYT</h1>\n    </div>\n  );\n}`,
         );
         console.log(`Overwritten main page as app/page.${ext}`);
       } catch (error) {
@@ -703,16 +705,16 @@ export default function RootLayout({
                 // For Next.js, install tailwindcss, @tailwindcss/postcss, postcss
                 execSync(
                   `${pm.addCmd} tailwindcss @tailwindcss/postcss postcss`,
-                  { stdio: "inherit" }
+                  { stdio: "inherit" },
                 );
                 // Write postcss.config.mjs
                 const postcssConfigPath = path.join(
                   projectPath,
-                  "postcss.config.mjs"
+                  "postcss.config.mjs",
                 );
                 fs.writeFileSync(
                   postcssConfigPath,
-                  'const config = {  plugins: {    "@tailwindcss/postcss": {},  },};\nexport default config;'
+                  'const config = {  plugins: {    "@tailwindcss/postcss": {},  },};\nexport default config;',
                 );
                 // Update globals.css in app or src/app
                 let baseAppDir = projectPath;
@@ -750,7 +752,7 @@ export default function RootLayout({
                 execSync(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
                 execSync(
                   `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
-                  { stdio: "inherit" }
+                  { stdio: "inherit" },
                 );
                 break;
               case "next-auth":
@@ -787,14 +789,14 @@ export default function RootLayout({
         if (!fs.existsSync(gitignorePath)) {
           fs.writeFileSync(
             gitignorePath,
-            `# Logs\nlogs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\npnpm-debug.log*\nlerna-debug.log*\n\n# Dependencies\nnode_modules\n*.local\n\n# Editor directories and files\n.vscode/*\n!.vscode/extensions.json\n.idea\n.DS_Store\n*.suo\n*.ntvs*\n*.njsproj\n*.sln\n*.sw?\n\n# Environment variables\n.env\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\n`
+            `# Logs\nlogs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\npnpm-debug.log*\nlerna-debug.log*\n\n# Dependencies\nnode_modules\n*.local\n\n# Editor directories and files\n.vscode/*\n!.vscode/extensions.json\n.idea\n.DS_Store\n*.suo\n*.ntvs*\n*.njsproj\n*.sln\n*.sw?\n\n# Environment variables\n.env\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\n`,
           );
           console.log("Created .gitignore file.");
         }
         console.log("✅ Git repository initialized.");
       } catch (error) {
         console.error(
-          `❌ Failed to initialize Git repository: ${error.message}`
+          `❌ Failed to initialize Git repository: ${error.message}`,
         );
       }
     } else {
@@ -811,6 +813,9 @@ export default function RootLayout({
         try {
           let ideCommand = "";
           switch (selectedIDE) {
+            case "Zed":
+              ideCommand = "zed .";
+              break;
             case "VSCode":
               ideCommand = "code .";
               break;
@@ -827,10 +832,10 @@ export default function RootLayout({
           }
         } catch (error) {
           console.error(
-            `❌ Failed to open project with ${selectedIDE}: ${error.message}`
+            `❌ Failed to open project with ${selectedIDE}: ${error.message}`,
           );
           console.log(
-            `To open manually, run: 'cd ${projectName}' and then the appropriate IDE command.`
+            `To open manually, run: 'cd ${projectName}' and then the appropriate IDE command.`,
           );
         }
       }
@@ -848,10 +853,10 @@ export default function RootLayout({
         execSync(`${pm.name} run dev`, { stdio: "inherit" });
       } catch (error) {
         console.error(
-          `❌ Failed to start development server: ${error.message}`
+          `❌ Failed to start development server: ${error.message}`,
         );
         console.log(
-          `You can manually start it by running '${pm.name} run dev' in your project directory.`
+          `You can manually start it by running '${pm.name} run dev' in your project directory.`,
         );
       }
     }
@@ -860,7 +865,7 @@ export default function RootLayout({
   } catch (error) {
     console.error(
       "\n❌ An error occurred during project setup:",
-      error.message
+      error.message,
     );
     console.error("Please try again or report this issue.");
     process.exit(1);
