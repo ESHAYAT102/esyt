@@ -1,6 +1,16 @@
-# ESYT
+<h1 align=center>ESYT</h1>
 
+<div align=center>
+
+![GitHub Las Commit](https://img.shields.io/github/last-commit/ESHAYAT102/esyt?style=for-the-badge&labelColor=101418&color=9ccbfb)
+![GitHub Stars](https://img.shields.io/github/stars/ESHAYAT102/esyt?style=for-the-badge&labelColor=101418&color=b9c8da)
+![GitHub Repo Size](https://img.shields.io/github/repo-size/ESHAYAT102/esyt?style=for-the-badge&labelColor=101418&color=d3bfe6)
+
+</div>
+
+<p align=center>
 A modern CLI tool to quickly scaffold Vite or Next.js projects with your preferred tech stack.
+</p>
 
 ## Overview
 
@@ -108,3 +118,4 @@ Eshayat Al-Wasiu
 
 - Homepage: [https://esyt.eshayat.com](https://esyt.eshayat.com)
 - Repository: [https://github.com/ESHAYAT102/esyt](https://github.com/ESHAYAT102/esyt)
+
