@@ -21,7 +21,7 @@ A modern CLI tool to quickly scaffold Vite or Next.js projects with your preferr
 Prefer using bun with the create flow:
 
 ```bash
-bun create esyt@latest
+bun create esyt
 ```
 
 Alternatively:
@@ -39,7 +39,7 @@ pnpm create esyt@latest
 Run non-interactively with Tailwind and dotenv, install deps, open VSCode, run dev:
 
 ```bash
-bun create esyt@latest -- -vite -js test-app --tailwindcss --react-router --dotenv --axios -i -code -no-git -dev
+bun create esyt -- -vite -js test-app --tailwindcss --react-router --dotenv --axios -i -code -no-git -dev
 ```
 
 ## Useful flags
