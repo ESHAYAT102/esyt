@@ -18,26 +18,20 @@ A modern CLI tool to quickly scaffold Vite or Next.js projects with your preferr
 
 ## Install / run
 
-Prefer using the create flow (example uses bun):
+Prefer using bun with the create flow:
 
 ```bash
-bun create esyt@latest -- --yes
+bun create esyt@latest
 ```
 
 Alternatively:
 
 ```bash
 npm create esyt@latest
-pnpm create esyt@latest
 ```
 
-Or run locally for testing:
-
 ```bash
-node ./cli.js --help
-# or
-npm link
-esyt --help
+pnpm create esyt@latest
 ```
 
 ## Quick example
