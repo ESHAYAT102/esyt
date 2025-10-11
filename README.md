@@ -45,20 +45,20 @@ esyt --help
 Run non-interactively with Tailwind and dotenv, install deps, open VSCode, run dev:
 
 ```bash
-bun create esyt@latest -- --yes --tailwindcss --dotenv -code -dev
+bun create esyt@latest -- -vite -js test-app --tailwindcss --react-router --dotenv --axios -i -code -no-git -dev
 ```
 
 ## Useful flags
 
 - Framework: `-vite` / `-next`
 - Language: `-js` / `-ts`
+- Project Directory Name: e.g. test-app
 - Packages: `--tailwindcss`, `--dotenv`, or any `--<pkg>` / `-<pkg>`
 - Git: `-git` / override `--no-git`
 - Install: `-i` / `--install` / override `--no-install`
 - Editor: `-code`, `-zed`, `-cursor`, `-trae`
 - Dev server: `-dev` / override `--no-dev`
 - Non-interactive: `--yes` (accept sensible defaults)
-- Dry-run: `--dry-run` (prints commands instead of running)
 - Help/version: `-h` / `-v`
 
 Notes:
