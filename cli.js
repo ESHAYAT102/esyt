@@ -29,6 +29,9 @@ try {
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
+// Import helper functions from lib/flags.js
+const flagsModule = await import("./lib/flags.js");
+const { parseFlags, mapNpmToLabel, printHelp, validateFlags } = flagsModule;
 
 function detectPackageManager() {
   const userAgent = process.env.npm_config_user_agent || "";
@@ -98,46 +101,109 @@ function printTitle() {
 `);
 }
 
+// flag parsing helpers are provided by ./lib/flags.js
+
 async function run() {
   try {
     printTitle();
     const pm = detectPackageManager();
+    // Parse CLI flags and use them to skip prompts when valid. We still validate
+    // flags and fall back to interactive prompts for anything missing or wrong.
+    const flags = parseFlags(process.argv.slice(2));
+    // Validate flags and clear any invalid values so we prompt only for those
+    const invalid = validateFlags(flags);
+    for (const k of Object.keys(invalid)) {
+      // clear invalid keys so interactive prompts run for them
+      flags[k] = undefined;
+    }
+    // Helper to run or print commands depending on dryRun/yes flags
+    const runCommand = (cmd, options = {}) => {
+      if (flags.dryRun) {
+        console.log(`[dry-run] ${cmd}`);
+        return;
+      }
+      return execSync(cmd, options);
+    };
 
-    // 1. Framework selection prompt
-    const { framework } = await inquirer.prompt([
-      {
-        type: "list",
-        name: "framework",
-        message: "Which framework would you like to use?",
-        choices: ["Vite", "Next.js"],
-      },
-    ]);
+    // If user provided --yes, fill sensible defaults for any missing values so
+    // the CLI runs non-interactively.
+    if (flags.yes) {
+      flags.framework = flags.framework || "Vite";
+      flags.language = flags.language || "JavaScript";
+      flags.projectName = flags.projectName || "esyt-app";
+      flags.npmPackages = flags.npmPackages || [];
+      flags.gitInit = typeof flags.gitInit === "boolean" ? flags.gitInit : true;
+      flags.installDeps = typeof flags.installDeps === "boolean" ? flags.installDeps : true;
+      flags.selectedIDE = flags.selectedIDE || "None";
+      // runDevServer default only makes sense if installDeps is true
+      flags.runDevServer = typeof flags.runDevServer === "boolean" ? flags.runDevServer : true;
+    }
+    if (flags.help) {
+      printHelp();
+      process.exit(0);
+    }
+    if (flags.version) {
+      try {
+        const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
+        console.log(pkg.version || "");
+      } catch (e) {
+        console.log("");
+      }
+      process.exit(0);
+    }
 
-    // 2. Language selection prompt
-    const { language } = await inquirer.prompt([
-      {
-        type: "list",
-        name: "language",
-        message: "Will you be using JavaScript or TypeScript?",
-        choices: ["JavaScript", "TypeScript"],
-      },
-    ]);
-
-    // 3. Project name prompt
-    const { projectName } = await inquirer.prompt([
-      {
-        type: "input",
-        name: "projectName",
-        message: "What will your project be called?",
-        default: "esyt-app",
-        validate: (input) => {
-          if (/\s/.test(input)) {
-            return "Project name cannot contain spaces. Please use dashes or underscores.";
-          }
-          return true;
+    // 1. Framework selection
+    let framework = flags.framework;
+    if (!framework) {
+      const ans = await inquirer.prompt([
+        {
+          type: "list",
+          name: "framework",
+          message: "Which framework would you like to use?",
+          choices: ["Vite", "Next.js"],
         },
-      },
-    ]);
+      ]);
+      framework = ans.framework;
+    }
+
+    // 2. Language selection
+    let language = flags.language;
+    if (!language) {
+      const ans = await inquirer.prompt([
+        {
+          type: "list",
+          name: "language",
+          message: "Will you be using JavaScript or TypeScript?",
+          choices: ["JavaScript", "TypeScript"],
+        },
+      ]);
+      language = ans.language;
+    }
+
+    // 3. Project name
+    let projectName = flags.projectName;
+    // Validate flag-provided project name: reject if contains spaces
+    if (projectName && /\s/.test(projectName)) {
+      console.log("Provided project name contains spaces and will be ignored. Please enter a valid name.");
+      projectName = undefined;
+    }
+    if (!projectName) {
+      const ans = await inquirer.prompt([
+        {
+          type: "input",
+          name: "projectName",
+          message: "What will your project be called?",
+          default: "esyt-app",
+          validate: (input) => {
+            if (/\s/.test(input)) {
+              return "Project name cannot contain spaces. Please use dashes or underscores.";
+            }
+            return true;
+          },
+        },
+      ]);
+      projectName = ans.projectName;
+    }
 
     // 4. Package selection prompt (contextual)
     let packageChoices = [];
@@ -173,41 +239,79 @@ async function run() {
         "next-pwa",
       ];
     }
-    const { packages } = await inquirer.prompt([
-      {
-        type: "checkbox",
-        name: "packages",
-        message: "Which packages would you like to enable?",
-        choices: packageChoices,
-        default: [],
-      },
-    ]);
+    // 4. Package selection. Merge interactive labels with flags.npmPackages.
+    let packages = [];
+    // Map flag-provided npm packages to the interactive labels when possible.
+    if (flags.npmPackages && flags.npmPackages.length > 0) {
+      for (const np of flags.npmPackages) {
+        const mapped = mapNpmToLabel(np);
+        if (mapped) packages.push(mapped);
+        else {
+          // keep the raw npm package name to install later
+          packages.push(np);
+        }
+      }
+    }
+
+    // If no packages were provided via flags, prompt interactively (unless --yes)
+    if (packages.length === 0) {
+      if (flags.yes) {
+        packages = [];
+      } else {
+        const ans = await inquirer.prompt([
+          {
+            type: "checkbox",
+            name: "packages",
+            message: "Which packages would you like to enable?",
+            choices: packageChoices,
+            default: [],
+          },
+        ]);
+        packages = ans.packages;
+      }
+    }
 
     // 5. Git init, npm i, dev server, IDE selection prompts
-    const { gitInit, installDeps, selectedIDE } = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "gitInit",
-        message: "Initialize a new git repository?",
-        default: true,
-      },
-      {
-        type: "confirm",
-        name: "installDeps",
-        message: `Would you like us to run '${pm.installCmd}'?`,
-        default: true,
-      },
-      {
-        type: "list",
-        name: "selectedIDE",
-        message: "Which IDE would you like to open your project with?",
-        choices: ["Zed", "VSCode", "Cursor", "Trae", "None"],
-        default: "None",
-      },
-    ]);
+    // 5. Git init, install, and IDE selection. Use flags when available.
+    let gitInit = typeof flags.gitInit === "boolean" ? flags.gitInit : undefined;
+    let installDeps = typeof flags.installDeps === "boolean" ? flags.installDeps : undefined;
+    let selectedIDE = typeof flags.selectedIDE === "string" ? flags.selectedIDE : undefined;
 
-    let runDevServer = false;
-    if (installDeps) {
+    if (gitInit === undefined || installDeps === undefined || !selectedIDE) {
+      const prompts = [];
+      if (gitInit === undefined) {
+        prompts.push({
+          type: "confirm",
+          name: "gitInit",
+          message: "Initialize a new git repository?",
+          default: false,
+        });
+      }
+      if (installDeps === undefined) {
+        prompts.push({
+          type: "confirm",
+          name: "installDeps",
+          message: `Would you like us to run '${pm.installCmd}'?`,
+          default: true,
+        });
+      }
+      if (!selectedIDE) {
+        prompts.push({
+          type: "list",
+          name: "selectedIDE",
+          message: "Which IDE would you like to open your project with?",
+          choices: ["Zed", "VSCode", "Cursor", "Trae", "None"],
+          default: "None",
+        });
+      }
+      const ans = prompts.length > 0 ? await inquirer.prompt(prompts) : {};
+      if (ans.gitInit !== undefined) gitInit = ans.gitInit;
+      if (ans.installDeps !== undefined) installDeps = ans.installDeps;
+      if (ans.selectedIDE !== undefined) selectedIDE = ans.selectedIDE;
+    }
+
+    let runDevServer = typeof flags.runDevServer === "boolean" ? flags.runDevServer : undefined;
+    if (runDevServer === undefined && installDeps) {
       const devServerPrompt = await inquirer.prompt([
         {
           type: "confirm",
@@ -232,13 +336,11 @@ async function run() {
       // Auto-answer these prompts with "no" by sending two "no\n" lines to stdin.
       // We keep stdout/stderr inherited so the user still sees the command output.
       try {
-        execSync(viteCommand, {
+        runCommand(viteCommand, {
           stdio: ["pipe", "inherit", "inherit"],
           input: Buffer.from("no\nno\n"),
         });
       } catch (err) {
-        // If the command fails for any reason, surface the error and rethrow
-        // so the surrounding error handling can pick it up.
         throw err;
       }
 
@@ -246,7 +348,7 @@ async function run() {
 
       try {
         if (installDeps) {
-          execSync(pm.installCmd, { stdio: "inherit" });
+          runCommand(pm.installCmd, { stdio: "inherit" });
         }
       } catch (error) {
         console.error("Error during initial setup:", error.message);
@@ -279,10 +381,10 @@ async function run() {
               } else {
                 fs.unlinkSync(file.path);
               }
-            } catch (error) {}
+            } catch (error) { }
           }
         }
-      } catch (error) {}
+      } catch (error) { }
 
       try {
         const componentsDir = path.join(projectPath, "src", "components");
@@ -305,7 +407,7 @@ async function run() {
           footerPath,
           `export default function Footer() {\n  return (\n    <>\n      <h1>Footer</h1>\n    </>\n  )\n}`,
         );
-      } catch (error) {}
+      } catch (error) { }
 
       // Create routes directory and Routes file if React Router is selected
       if (packages.includes("React Router")) {
@@ -330,7 +432,7 @@ export const router = createBrowserRouter([
   },
 ]);`,
           );
-        } catch (error) {}
+        } catch (error) { }
       }
 
       try {
@@ -342,73 +444,66 @@ export const router = createBrowserRouter([
         if (fs.existsSync(appJsxPath)) {
           try {
             const appContent = packages.includes("React Router")
-              ? `import { RouterProvider } from "react-router-dom";\nimport { router } from "./routes/Routes${
-                  language === "JavaScript" ? ".jsx" : ".tsx"
-                }";\n\nfunction App() {\n  return (\n    <>\n      <RouterProvider router={router} />\n    </>\n  );\n}\n\nexport default App;`
+              ? `import { RouterProvider } from "react-router-dom";\nimport { router } from "./routes/Routes${language === "JavaScript" ? ".jsx" : ".tsx"
+              }";\n\nfunction App() {\n  return (\n    <>\n      <RouterProvider router={router} />\n    </>\n  );\n}\n\nexport default App;`
               : `import Navbar from "./components/Navbar";\nimport Home from "./pages/Home";\nimport Footer from "./components/Footer";\n\nexport default function App() {\n  return (\n    <>\n      <Navbar/>\n      <Footer/>\n    </>\n  );\n}`;
             fs.writeFileSync(appJsxPath, appContent);
-          } catch (error) {}
+          } catch (error) { }
         }
         const indexHtmlPath = path.join(projectPath, "index.html");
         if (fs.existsSync(indexHtmlPath)) {
           try {
             fs.writeFileSync(
               indexHtmlPath,
-              `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${
-                language === "JavaScript" ? "jsx" : "tsx"
+              `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${language === "JavaScript" ? "jsx" : "tsx"
               }\"></script>\n  </body>\n</html>\n`,
             );
-          } catch (error) {}
+          } catch (error) { }
         }
-      } catch (error) {}
+      } catch (error) { }
 
       if (installDeps) {
         try {
           if (packages.includes("Clerk")) {
             try {
-              execSync(`${pm.addCmd} @clerk/clerk-react`, { stdio: "inherit" });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} @clerk/clerk-react`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("Appwrite")) {
             try {
-              execSync(`${pm.addCmd} appwrite`, { stdio: "inherit" });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} appwrite`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("Prisma")) {
             try {
-              execSync(`${pm.addDevCmd} prisma`, { stdio: "inherit" });
-              execSync(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
-              execSync(
-                `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
-                { stdio: "inherit" },
-              );
-            } catch (error) {}
+              runCommand(`${pm.addDevCmd} prisma`, { stdio: "inherit" });
+              runCommand(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
+              runCommand(`${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("React Icons")) {
             try {
-              execSync(`${pm.addCmd} react-icons`, { stdio: "inherit" });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} react-icons`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("Framer Motion")) {
             try {
-              execSync(`${pm.addCmd} framer-motion motion`, {
-                stdio: "inherit",
-              });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} framer-motion motion`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("React Router")) {
             try {
-              execSync(`${pm.addCmd} react-router-dom`, { stdio: "inherit" });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} react-router-dom`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("OGL")) {
             try {
-              execSync(`${pm.addCmd} ogl`, { stdio: "inherit" });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} ogl`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("Firebase")) {
             try {
-              execSync(`${pm.addCmd} firebase`, { stdio: "inherit" });
+              runCommand(`${pm.addCmd} firebase`, { stdio: "inherit" });
               const firebaseDir = path.join(projectPath, "src", "firebase");
               if (!fs.existsSync(firebaseDir)) {
                 fs.mkdirSync(firebaseDir, { recursive: true });
@@ -426,23 +521,21 @@ export const router = createBrowserRouter([
                 envPath,
                 `VITE_FIREBASE_API_KEY=\nVITE_FIREBASE_AUTH_DOMAIN=\nVITE_FIREBASE_PROJECT_ID=\nVITE_FIREBASE_STORAGE_BUCKET=\nVITE_FIREBASE_APP_ID=\nVITE_SERVER_URL=`,
               );
-            } catch (error) {}
+            } catch (error) { }
           }
           if (packages.includes("DotENV")) {
             try {
-              execSync(`${pm.addCmd} dotenv`, { stdio: "inherit" });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} dotenv`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("Axios")) {
             try {
-              execSync(`${pm.addCmd} axios`, { stdio: "inherit" });
-            } catch (error) {}
+              runCommand(`${pm.addCmd} axios`, { stdio: "inherit" });
+            } catch (error) { }
           }
           if (packages.includes("TailwindCSS")) {
             try {
-              execSync(`${pm.addCmd} tailwindcss @tailwindcss/vite`, {
-                stdio: "inherit",
-              });
+              runCommand(`${pm.addCmd} tailwindcss @tailwindcss/vite`, { stdio: "inherit" });
               const indexCssPath = path.join(projectPath, "src", "index.css");
               if (fs.existsSync(indexCssPath)) {
                 fs.writeFileSync(indexCssPath, `@import "tailwindcss";\n`);
@@ -458,7 +551,7 @@ export const router = createBrowserRouter([
                     `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`,
                   );
                 }
-              } catch (error) {}
+              } catch (error) { }
               const viteConfigPath = path.join(projectPath, "vite.config.js");
               if (fs.existsSync(viteConfigPath)) {
                 fs.writeFileSync(
@@ -466,9 +559,20 @@ export const router = createBrowserRouter([
                   `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`,
                 );
               }
-            } catch (error) {}
+            } catch (error) { }
           }
-        } catch (error) {}
+        } catch (error) { }
+      }
+      // Install any arbitrary npm packages provided via flags
+      if (flags.npmPackages && flags.npmPackages.length > 0 && installDeps) {
+        for (const np of flags.npmPackages) {
+          try {
+            console.log(`Installing extra package: ${np}`);
+            runCommand(`${pm.addCmd} ${np}`, { stdio: "inherit" });
+          } catch (error) {
+            console.error(`Failed to install ${np}: ${error.message}`);
+          }
+        }
       }
       try {
         const pagesDir = path.join(projectPath, "src", "pages");
@@ -483,35 +587,46 @@ export const router = createBrowserRouter([
           homePath,
           `export default function Home() {\n  return (\n    <>\n      <h1>Home</h1>\n    </>\n  )\n}`,
         );
-      } catch (error) {}
+      } catch (error) { }
     } else if (framework === "Next.js") {
       // --- Next.js extra options prompt ---
-      const nextOptions = await inquirer.prompt([
-        {
-          type: "confirm",
-          name: "eslint",
-          message: "Would you like to use ESLint?",
-          default: true,
-        },
-        {
-          type: "confirm",
-          name: "srcDir",
-          message: "Would you like your code inside a 'src/' directory?",
-          default: false,
-        },
-        {
-          type: "confirm",
-          name: "appRouter",
-          message: "Would you like to use App Router? (recommended)",
-          default: true,
-        },
-        {
-          type: "confirm",
-          name: "turbo",
-          message: "Would you like to use Turbopack for 'next dev'?",
-          default: true,
-        },
-      ]);
+      let nextOptions;
+      if (flags.yes) {
+        // sensible defaults for non-interactive mode
+        nextOptions = {
+          eslint: true,
+          srcDir: false,
+          appRouter: true,
+          turbo: true,
+        };
+      } else {
+        nextOptions = await inquirer.prompt([
+          {
+            type: "confirm",
+            name: "eslint",
+            message: "Would you like to use ESLint?",
+            default: true,
+          },
+          {
+            type: "confirm",
+            name: "srcDir",
+            message: "Would you like your code inside a 'src/' directory?",
+            default: false,
+          },
+          {
+            type: "confirm",
+            name: "appRouter",
+            message: "Would you like to use App Router? (recommended)",
+            default: true,
+          },
+          {
+            type: "confirm",
+            name: "turbo",
+            message: "Would you like to use Turbopack for 'next dev'?",
+            default: true,
+          },
+        ]);
+      }
       // Tailwind CSS autofill
       const useTailwind = packages.includes("TailwindCSS");
       // --- Next.js project creation ---
@@ -535,7 +650,7 @@ export const router = createBrowserRouter([
         nextFlagsParts.join(" "),
       );
       console.log(`Running: ${nextCommand}`);
-      execSync(nextCommand, { stdio: "inherit" });
+      runCommand(nextCommand, { stdio: "inherit" });
       console.log("Next.js project created.");
       process.chdir(projectPath);
       // Cleanup: Remove README.md for Next.js projects (to match Vite cleanup)
@@ -544,12 +659,12 @@ export const router = createBrowserRouter([
         if (fs.existsSync(readmePath)) {
           fs.unlinkSync(readmePath);
         }
-      } catch (error) {}
+      } catch (error) { }
       console.log(`Changed directory to: ${projectName}`);
       try {
         if (installDeps) {
           console.log("Installing initial dependencies...");
-          execSync(pm.installCmd, { stdio: "inherit" });
+          runCommand(pm.installCmd, { stdio: "inherit" });
         } else {
           console.log(
             "Skipping initial dependencies installation as requested.",
@@ -727,53 +842,61 @@ export default function RootLayout({
                 fs.writeFileSync(globalsCssPath, '@import "tailwindcss";\n');
                 break;
               case "React Icons":
-                execSync(`${pm.addCmd} react-icons`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} react-icons`, { stdio: "inherit" });
                 break;
               case "Framer Motion":
-                execSync(`${pm.addCmd} framer-motion`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} framer-motion`, { stdio: "inherit" });
                 break;
               case "DotENV":
-                execSync(`${pm.addCmd} dotenv`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} dotenv`, { stdio: "inherit" });
                 break;
               case "Axios":
-                execSync(`${pm.addCmd} axios`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} axios`, { stdio: "inherit" });
                 break;
               case "Firebase":
-                execSync(`${pm.addCmd} firebase`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} firebase`, { stdio: "inherit" });
                 break;
               case "Clerk":
-                execSync(`${pm.addCmd} @clerk/nextjs`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} @clerk/nextjs`, { stdio: "inherit" });
                 break;
               case "Appwrite":
-                execSync(`${pm.addCmd} appwrite`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} appwrite`, { stdio: "inherit" });
                 break;
               case "Prisma":
-                execSync(`${pm.addDevCmd} prisma`, { stdio: "inherit" });
-                execSync(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
-                execSync(
-                  `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
-                  { stdio: "inherit" },
-                );
+                runCommand(`${pm.addDevCmd} prisma`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
+                runCommand(`${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`, { stdio: "inherit" });
                 break;
               case "next-auth":
-                execSync(`${pm.addCmd} next-auth`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} next-auth`, { stdio: "inherit" });
                 break;
               case "@next/font":
-                execSync(`${pm.addCmd} @next/font`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} @next/font`, { stdio: "inherit" });
                 break;
               case "next-seo":
-                execSync(`${pm.addCmd} next-seo`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} next-seo`, { stdio: "inherit" });
                 break;
               case "next-sitemap":
-                execSync(`${pm.addCmd} next-sitemap`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} next-sitemap`, { stdio: "inherit" });
                 break;
               case "next-pwa":
-                execSync(`${pm.addCmd} next-pwa`, { stdio: "inherit" });
+                runCommand(`${pm.addCmd} next-pwa`, { stdio: "inherit" });
                 break;
             }
             console.log(`✅ ${pkg} installed.`);
           } catch (error) {
             console.error(`❌ Failed to install ${pkg}: ${error.message}`);
+          }
+        }
+        // Install any arbitrary npm packages provided via flags
+        if (flags.npmPackages && flags.npmPackages.length > 0) {
+          for (const np of flags.npmPackages) {
+            try {
+              console.log(`Installing extra package: ${np}`);
+              runCommand(`${pm.addCmd} ${np}`, { stdio: "inherit" });
+            } catch (error) {
+              console.error(`Failed to install ${np}: ${error.message}`);
+            }
           }
         }
       }
@@ -784,7 +907,7 @@ export default function RootLayout({
     if (gitInit) {
       try {
         console.log("\nInitializing Git repository...");
-        execSync("git init", { stdio: "inherit" });
+        runCommand("git init", { stdio: "inherit" });
         const gitignorePath = path.join(projectPath, ".gitignore");
         if (!fs.existsSync(gitignorePath)) {
           fs.writeFileSync(
@@ -827,7 +950,7 @@ export default function RootLayout({
               break;
           }
           if (ideCommand) {
-            execSync(ideCommand, { stdio: "inherit" });
+            runCommand(ideCommand, { stdio: "inherit" });
             console.log(`✅ Project opened with ${selectedIDE}.`);
           }
         } catch (error) {
@@ -850,7 +973,7 @@ export default function RootLayout({
         // Change to project directory
         process.chdir(projectPath);
         // Run the dev server command
-        execSync(`${pm.name} run dev`, { stdio: "inherit" });
+        runCommand(`${pm.name} run dev`, { stdio: "inherit" });
       } catch (error) {
         console.error(
           `❌ Failed to start development server: ${error.message}`,
