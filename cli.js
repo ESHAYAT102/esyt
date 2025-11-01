@@ -1,31 +1,5 @@
 #!/usr/bin/env node
-// Attempt to dynamically load `figures` and override the tick symbol.
-// Do this before importing `inquirer` so when inquirer loads, it will
-// pick up the modified symbol. If `figures` isn't available in the
-// environment where this script runs (for example when `bun create`
-// executes a temporary package), we silently continue.
-let inquirer;
-try {
-  // Top-level await is supported in modern Node; use dynamic import so missing
-  // `figures` doesn't cause a hard crash.
-  const figMod = await import("figures").catch(() => null);
-  if (figMod) {
-    const figures = figMod.default || figMod;
-    try {
-      if (figures && typeof figures === "object") {
-        figures.tick = "→ ";
-      }
-    } catch (e) {
-      // ignore if unable to set
-    }
-  }
-  const inquirerMod = await import("inquirer");
-  inquirer = inquirerMod.default || inquirerMod;
-} catch (err) {
-  // If dynamic import of inquirer fails for whatever reason, rethrow so the
-  // existing error handling higher up can catch and report it.
-  throw err;
-}
+import * as p from "@clack/prompts";
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
@@ -155,29 +129,33 @@ async function run() {
     // 1. Framework selection
     let framework = flags.framework;
     if (!framework) {
-      const ans = await inquirer.prompt([
-        {
-          type: "list",
-          name: "framework",
-          message: "Which framework would you like to use?",
-          choices: ["Vite", "Next.js"],
-        },
-      ]);
-      framework = ans.framework;
+      framework = await p.select({
+        message: "Which framework would you like to use?",
+        options: [
+          { value: "Vite", label: "Vite" },
+          { value: "Next.js", label: "Next.js" },
+        ],
+      });
+      if (p.isCancel(framework)) {
+        p.cancel("Operation cancelled.");
+        process.exit(0);
+      }
     }
 
     // 2. Language selection
     let language = flags.language;
     if (!language) {
-      const ans = await inquirer.prompt([
-        {
-          type: "list",
-          name: "language",
-          message: "Will you be using JavaScript or TypeScript?",
-          choices: ["JavaScript", "TypeScript"],
-        },
-      ]);
-      language = ans.language;
+      language = await p.select({
+        message: "Will you be using JavaScript or TypeScript?",
+        options: [
+          { value: "JavaScript", label: "JavaScript" },
+          { value: "TypeScript", label: "TypeScript" },
+        ],
+      });
+      if (p.isCancel(language)) {
+        p.cancel("Operation cancelled.");
+        process.exit(0);
+      }
     }
 
     // 3. Project name
@@ -188,21 +166,22 @@ async function run() {
       projectName = undefined;
     }
     if (!projectName) {
-      const ans = await inquirer.prompt([
-        {
-          type: "input",
-          name: "projectName",
-          message: "What will your project be called?",
-          default: "esyt-app",
-          validate: (input) => {
-            if (/\s/.test(input)) {
-              return "Project name cannot contain spaces. Please use dashes or underscores.";
-            }
-            return true;
-          },
+      projectName = await p.text({
+        message: "What will your project be called?",
+        placeholder: "esyt-app",
+        validate: (value) => {
+          if (!value || value.trim() === "") {
+            return "Project name is required.";
+          }
+          if (/\s/.test(value)) {
+            return "Project name cannot contain spaces. Please use dashes or underscores.";
+          }
         },
-      ]);
-      projectName = ans.projectName;
+      });
+      if (p.isCancel(projectName)) {
+        p.cancel("Operation cancelled.");
+        process.exit(0);
+      }
     }
 
     // 4. Package selection prompt (contextual)
@@ -258,16 +237,18 @@ async function run() {
       if (flags.yes) {
         packages = [];
       } else {
-        const ans = await inquirer.prompt([
-          {
-            type: "checkbox",
-            name: "packages",
-            message: "Which packages would you like to enable?",
-            choices: packageChoices,
-            default: [],
-          },
-        ]);
-        packages = ans.packages;
+        const selected = await p.multiselect({
+          message: "Which packages would you like to enable?",
+          options: packageChoices.map((choice) => ({
+            value: choice,
+            label: choice,
+          })),
+        });
+        if (p.isCancel(selected)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        packages = selected;
       }
     }
 
@@ -278,50 +259,59 @@ async function run() {
     let selectedIDE = typeof flags.selectedIDE === "string" ? flags.selectedIDE : undefined;
 
     if (gitInit === undefined || installDeps === undefined || !selectedIDE) {
-      const prompts = [];
       if (gitInit === undefined) {
-        prompts.push({
-          type: "confirm",
-          name: "gitInit",
+        const result = await p.confirm({
           message: "Initialize a new git repository?",
-          default: false,
+          initialValue: false,
         });
+        if (p.isCancel(result)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        gitInit = result;
       }
       if (installDeps === undefined) {
-        prompts.push({
-          type: "confirm",
-          name: "installDeps",
+        const result = await p.confirm({
           message: `Would you like us to run '${pm.installCmd}'?`,
-          default: true,
+          initialValue: true,
         });
+        if (p.isCancel(result)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        installDeps = result;
       }
       if (!selectedIDE) {
-        prompts.push({
-          type: "list",
-          name: "selectedIDE",
+        const result = await p.select({
           message: "Which IDE would you like to open your project with?",
-          choices: ["Zed", "VSCode", "Cursor", "Trae", "None"],
-          default: "None",
+          options: [
+            { value: "Zed", label: "Zed" },
+            { value: "VSCode", label: "VSCode" },
+            { value: "Cursor", label: "Cursor" },
+            { value: "Trae", label: "Trae" },
+            { value: "None", label: "None" },
+          ],
+          initialValue: "None",
         });
+        if (p.isCancel(result)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        selectedIDE = result;
       }
-      const ans = prompts.length > 0 ? await inquirer.prompt(prompts) : {};
-      if (ans.gitInit !== undefined) gitInit = ans.gitInit;
-      if (ans.installDeps !== undefined) installDeps = ans.installDeps;
-      if (ans.selectedIDE !== undefined) selectedIDE = ans.selectedIDE;
     }
 
     let runDevServer = typeof flags.runDevServer === "boolean" ? flags.runDevServer : undefined;
     if (runDevServer === undefined && installDeps) {
-      const devServerPrompt = await inquirer.prompt([
-        {
-          type: "confirm",
-          name: "runDevServer",
-          message:
-            "Would you like to run the development server automatically after setup?",
-          default: true,
-        },
-      ]);
-      runDevServer = devServerPrompt.runDevServer;
+      const result = await p.confirm({
+        message: "Would you like to run the development server automatically after setup?",
+        initialValue: true,
+      });
+      if (p.isCancel(result)) {
+        p.cancel("Operation cancelled.");
+        process.exit(0);
+      }
+      runDevServer = result;
     }
 
     const projectPath = path.join(process.cwd(), projectName);
@@ -600,32 +590,39 @@ export const router = createBrowserRouter([
           turbo: true,
         };
       } else {
-        nextOptions = await inquirer.prompt([
-          {
-            type: "confirm",
-            name: "eslint",
-            message: "Would you like to use ESLint?",
-            default: true,
-          },
-          {
-            type: "confirm",
-            name: "srcDir",
-            message: "Would you like your code inside a 'src/' directory?",
-            default: false,
-          },
-          {
-            type: "confirm",
-            name: "appRouter",
-            message: "Would you like to use App Router? (recommended)",
-            default: true,
-          },
-          {
-            type: "confirm",
-            name: "turbo",
-            message: "Would you like to use Turbopack for 'next dev'?",
-            default: true,
-          },
-        ]);
+        const eslint = await p.confirm({
+          message: "Would you like to use ESLint?",
+          initialValue: true,
+        });
+        if (p.isCancel(eslint)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        const srcDir = await p.confirm({
+          message: "Would you like your code inside a 'src/' directory?",
+          initialValue: false,
+        });
+        if (p.isCancel(srcDir)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        const appRouter = await p.confirm({
+          message: "Would you like to use App Router? (recommended)",
+          initialValue: true,
+        });
+        if (p.isCancel(appRouter)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        const turbo = await p.confirm({
+          message: "Would you like to use Turbopack for 'next dev'?",
+          initialValue: true,
+        });
+        if (p.isCancel(turbo)) {
+          p.cancel("Operation cancelled.");
+          process.exit(0);
+        }
+        nextOptions = { eslint, srcDir, appRouter, turbo };
       }
       // Tailwind CSS autofill
       const useTailwind = packages.includes("TailwindCSS");

@@ -1,6 +1,6 @@
 {
   "name": "create-esyt",
-  "version": "13.1.3",
+  "version": "14.0.0",
   "description": "A tool to create a new esyt project with your preferred stack",
   "main": "cli.js",
   "bin": {
@@ -34,9 +34,8 @@
   },
   "homepage": "https://esyt.eshayat.com",
   "dependencies": {
-    "inquirer": "^12.5.0"
+    "@clack/prompts": "^0.8.2"
   },
-  "type": "module"
-  ,
+  "type": "module",
   "preferGlobal": true
 }
