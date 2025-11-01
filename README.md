@@ -16,14 +16,14 @@ A modern CLI tool to quickly scaffold Vite or Next.js projects with your preferr
 
 `esyt` is a command-line interface tool that helps you create new Vite or Next.js projects with JavaScript or TypeScript, and popular packages like TailwindCSS, Framer Motion, Clerk, Appwrite, Prisma, and more. It provides a clean, professional setup experience with minimal output and smart automation.
 
-## Install / run
+## Install
 
 <img alt="ESYT setup" src="./assets/esyt.gif" />
 
 Prefer using bun with the create flow:
 
 ```bash
-bun create esyt
+bun create esyt@latest
 ```
 
 Alternatively:
