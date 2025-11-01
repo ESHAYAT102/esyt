@@ -18,6 +18,8 @@ A modern CLI tool to quickly scaffold Vite or Next.js projects with your preferr
 
 ## Install / run
 
+<img alt="ESYT setup" src="./assets/esyt.gif" />
+
 Prefer using bun with the create flow:
 
 ```bash
@@ -56,6 +58,7 @@ bun create esyt -- -vite -js test-app --tailwindcss --react-router --dotenv --ax
 - Help/version: `-h` / `-v`
 
 Notes:
+
 - Use `--` after `bun create` (or similar) to forward flags to this CLI.
 - `--yes` can be combined with `--no-git` to override defaults.
 
