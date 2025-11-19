@@ -1,6 +1,6 @@
 {
   "name": "create-esyt",
-  "version": "14.0.2",
+  "version": "14.0.4",
   "description": "A tool to create a new esyt project with your preferred stack",
   "main": "cli.js",
   "bin": {

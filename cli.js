@@ -579,51 +579,18 @@ export const router = createBrowserRouter([
         );
       } catch (error) { }
     } else if (framework === "Next.js") {
-      // --- Next.js extra options prompt ---
-      let nextOptions;
-      if (flags.yes) {
-        // sensible defaults for non-interactive mode
-        nextOptions = {
-          eslint: true,
-          srcDir: false,
-          appRouter: true,
-          turbo: true,
-        };
-      } else {
-        const eslint = await p.confirm({
-          message: "Would you like to use ESLint?",
-          initialValue: true,
-        });
-        if (p.isCancel(eslint)) {
-          p.cancel("Operation cancelled.");
-          process.exit(0);
-        }
-        const srcDir = await p.confirm({
-          message: "Would you like your code inside a 'src/' directory?",
-          initialValue: false,
-        });
-        if (p.isCancel(srcDir)) {
-          p.cancel("Operation cancelled.");
-          process.exit(0);
-        }
-        const appRouter = await p.confirm({
-          message: "Would you like to use App Router? (recommended)",
-          initialValue: true,
-        });
-        if (p.isCancel(appRouter)) {
-          p.cancel("Operation cancelled.");
-          process.exit(0);
-        }
-        const turbo = await p.confirm({
-          message: "Would you like to use Turbopack for 'next dev'?",
-          initialValue: true,
-        });
-        if (p.isCancel(turbo)) {
-          p.cancel("Operation cancelled.");
-          process.exit(0);
-        }
-        nextOptions = { eslint, srcDir, appRouter, turbo };
-      }
+      // --- Next.js extra options (handled automatically) ---
+      // These options are now automated with sensible defaults:
+      // - ESLint: enabled
+      // - src/ directory: disabled
+      // - App Router: enabled
+      // - Turbopack: enabled
+      const nextOptions = {
+        eslint: true,
+        srcDir: false,
+        appRouter: true,
+        turbo: true,
+      };
       // Tailwind CSS autofill
       const useTailwind = packages.includes("TailwindCSS");
       // --- Next.js project creation ---
@@ -642,6 +609,8 @@ export const router = createBrowserRouter([
       if (nextOptions.turbo) {
         nextFlagsParts.push("--turbopack", '--import-alias "@/*"');
       }
+      // Add React Compiler flag (disabled) to suppress prompt
+      nextFlagsParts.push("--no-react-compiler");
       const nextCommand = pm.createNextCmd(
         projectName,
         nextFlagsParts.join(" "),
