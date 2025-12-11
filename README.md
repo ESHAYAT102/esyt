@@ -52,7 +52,7 @@ bun create esyt -- -vite -js test-app --tailwindcss --react-router --dotenv --ax
 - Packages: `--tailwindcss`, `--dotenv`, or any `--<pkg>` / `-<pkg>`
 - Git: `-git` / override `--no-git`
 - Install: `-i` / `--install` / override `--no-install`
-- Editor: `-code`, `-zed`, `-cursor`, `-trae`
+- Editor: `-nvim`, `-code`, `-zed`, `-cursor`, `-trae`
 - Dev server: `-dev` / override `--no-dev`
 - Non-interactive: `--yes` (accept sensible defaults)
 - Help/version: `-h` / `-v`

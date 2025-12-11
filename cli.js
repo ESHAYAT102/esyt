@@ -285,6 +285,7 @@ async function run() {
         const result = await p.select({
           message: "Which IDE would you like to open your project with?",
           options: [
+            { value: "Nvim", label: "Neovim" },
             { value: "Zed", label: "Zed" },
             { value: "VSCode", label: "VSCode" },
             { value: "Cursor", label: "Cursor" },
@@ -902,6 +903,9 @@ export default function RootLayout({
         try {
           let ideCommand = "";
           switch (selectedIDE) {
+            case "Nvim":
+              ideCommand = "nvim .";
+              break;
             case "Zed":
               ideCommand = "zed .";
               break;
