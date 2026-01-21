@@ -121,7 +121,7 @@ async function run() {
     if (flags.version) {
       try {
         const pkg = JSON.parse(
-          fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8")
+          fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
         );
         console.log(pkg.version || "");
       } catch (e) {
@@ -167,7 +167,7 @@ async function run() {
     // Validate flag-provided project name: reject if contains spaces
     if (projectName && /\s/.test(projectName)) {
       console.log(
-        "Provided project name contains spaces and will be ignored. Please enter a valid name."
+        "Provided project name contains spaces and will be ignored. Please enter a valid name.",
       );
       projectName = undefined;
     }
@@ -395,19 +395,19 @@ async function run() {
         }
         const navbarPath = path.join(
           componentsDir,
-          `Navbar.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `Navbar.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         fs.writeFileSync(
           navbarPath,
-          `export default function Navbar() {\n  return (\n    <>\n      <h1>Navbar</h1>\n    </>\n  )\n}`
+          `export default function Navbar() {\n  return (\n    <>\n      <h1>Navbar</h1>\n    </>\n  )\n}`,
         );
         const footerPath = path.join(
           componentsDir,
-          `Footer.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `Footer.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         fs.writeFileSync(
           footerPath,
-          `export default function Footer() {\n  return (\n    <>\n      <h1>Footer</h1>\n    </>\n  )\n}`
+          `export default function Footer() {\n  return (\n    <>\n      <h1>Footer</h1>\n    </>\n  )\n}`,
         );
       } catch (error) {}
 
@@ -420,7 +420,7 @@ async function run() {
           }
           const routesPath = path.join(
             routesDir,
-            `Routes.${language === "JavaScript" ? "jsx" : "tsx"}`
+            `Routes.${language === "JavaScript" ? "jsx" : "tsx"}`,
           );
           fs.writeFileSync(
             routesPath,
@@ -432,7 +432,7 @@ export const router = createBrowserRouter([
     path: "/",
     element: <Home />,
   },
-]);`
+]);`,
           );
         } catch (error) {}
       }
@@ -441,7 +441,7 @@ export const router = createBrowserRouter([
         const appJsxPath = path.join(
           projectPath,
           "src",
-          `App.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `App.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         if (fs.existsSync(appJsxPath)) {
           try {
@@ -460,7 +460,7 @@ export const router = createBrowserRouter([
               indexHtmlPath,
               `<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <link rel=\"stylesheet\" href=\"./src/index.css\" />\n    <title>ESYT App</title>\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.${
                 language === "JavaScript" ? "jsx" : "tsx"
-              }\"></script>\n  </body>\n</html>\n`
+              }\"></script>\n  </body>\n</html>\n`,
             );
           } catch (error) {}
         }
@@ -486,7 +486,7 @@ export const router = createBrowserRouter([
               runCommand(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
               runCommand(
                 `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
-                { stdio: "inherit" }
+                { stdio: "inherit" },
               );
             } catch (error) {}
           }
@@ -521,16 +521,16 @@ export const router = createBrowserRouter([
               }
               const firebaseConfigPath = path.join(
                 firebaseDir,
-                "firebase.config.js"
+                "firebase.config.js",
               );
               fs.writeFileSync(
                 firebaseConfigPath,
-                `import { initializeApp } from "firebase/app";\nimport { getAuth } from "firebase/auth";\n\nconst firebaseConfig = {\n  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,\n  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,\n  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,\n  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,\n  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,\n  appId: import.meta.env.VITE_FIREBASE_APP_ID,\n};\n\nconst app = initializeApp(firebaseConfig);\nexport const auth = getAuth(app);`
+                `import { initializeApp } from "firebase/app";\nimport { getAuth } from "firebase/auth";\n\nconst firebaseConfig = {\n  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,\n  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,\n  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,\n  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,\n  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,\n  appId: import.meta.env.VITE_FIREBASE_APP_ID,\n};\n\nconst app = initializeApp(firebaseConfig);\nexport const auth = getAuth(app);`,
               );
               const envPath = path.join(projectPath, ".env");
               fs.writeFileSync(
                 envPath,
-                `VITE_FIREBASE_API_KEY=\nVITE_FIREBASE_AUTH_DOMAIN=\nVITE_FIREBASE_PROJECT_ID=\nVITE_FIREBASE_STORAGE_BUCKET=\nVITE_FIREBASE_APP_ID=\nVITE_SERVER_URL=`
+                `VITE_FIREBASE_API_KEY=\nVITE_FIREBASE_AUTH_DOMAIN=\nVITE_FIREBASE_PROJECT_ID=\nVITE_FIREBASE_STORAGE_BUCKET=\nVITE_FIREBASE_APP_ID=\nVITE_SERVER_URL=`,
               );
             } catch (error) {}
           }
@@ -555,25 +555,25 @@ export const router = createBrowserRouter([
               }
               const tailwindConfigPath = path.join(
                 projectPath,
-                "tailwind.config.js"
+                "tailwind.config.js",
               );
               try {
                 if (!fs.existsSync(tailwindConfigPath)) {
                   fs.writeFileSync(
                     tailwindConfigPath,
-                    `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`
+                    `/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n`,
                   );
                 }
               } catch (error) {}
               const viteConfigExt = language === "TypeScript" ? "ts" : "js";
               const viteConfigPath = path.join(
                 projectPath,
-                `vite.config.${viteConfigExt}`
+                `vite.config.${viteConfigExt}`,
               );
               if (fs.existsSync(viteConfigPath)) {
                 fs.writeFileSync(
                   viteConfigPath,
-                  `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`
+                  `import { defineConfig } from "vite";\nimport react from "@vitejs/plugin-react";\nimport tailwindcss from "@tailwindcss/vite";\n\nexport default defineConfig({\n  plugins: [react(), tailwindcss()],\n});\n`,
                 );
               }
             } catch (error) {}
@@ -598,11 +598,11 @@ export const router = createBrowserRouter([
         }
         const homePath = path.join(
           pagesDir,
-          `Home.${language === "JavaScript" ? "jsx" : "tsx"}`
+          `Home.${language === "JavaScript" ? "jsx" : "tsx"}`,
         );
         fs.writeFileSync(
           homePath,
-          `export default function Home() {\n  return (\n    <>\n      <h1>Home</h1>\n    </>\n  )\n}`
+          `export default function Home() {\n  return (\n    <>\n      <h1>Home</h1>\n    </>\n  )\n}`,
         );
       } catch (error) {}
     } else if (framework === "Next.js") {
@@ -640,7 +640,7 @@ export const router = createBrowserRouter([
       nextFlagsParts.push("--no-react-compiler");
       const nextCommand = pm.createNextCmd(
         projectName,
-        nextFlagsParts.join(" ")
+        nextFlagsParts.join(" "),
       );
       console.log(`Running: ${nextCommand}`);
       runCommand(nextCommand, { stdio: "inherit" });
@@ -660,7 +660,7 @@ export const router = createBrowserRouter([
           runCommand(pm.installCmd, { stdio: "inherit" });
         } else {
           console.log(
-            "Skipping initial dependencies installation as requested."
+            "Skipping initial dependencies installation as requested.",
           );
         }
       } catch (error) {
@@ -687,15 +687,15 @@ export const router = createBrowserRouter([
         const navbarPath = path.join(componentsDir, `Navbar.${ext}`);
         fs.writeFileSync(
           navbarPath,
-          `export default function Navbar() {\n  return (\n    <nav className="p-16 border-b border-slate-200">\n      <h1>Navbar</h1>\n    </nav>\n  )\n}`
+          `export default function Navbar() {\n  return (\n    <nav className="p-16 border-b border-slate-200">\n      <h1>Navbar</h1>\n    </nav>\n  )\n}`,
         );
         const footerPath = path.join(componentsDir, `Footer.${ext}`);
         fs.writeFileSync(
           footerPath,
-          `export default function Footer() {\n  return (\n    <footer className="p-16 border-t border-slate-200">\n      <h1>Footer</h1>\n    </footer>\n  )\n}`
+          `export default function Footer() {\n  return (\n    <footer className="p-16 border-t border-slate-200">\n      <h1>Footer</h1>\n    </footer>\n  )\n}`,
         );
         console.log(
-          "Created Navbar and Footer components inside app/components."
+          "Created Navbar and Footer components inside app/components.",
         );
       } catch (error) {
         console.error("Error creating components:", error.message);
@@ -708,13 +708,13 @@ export const router = createBrowserRouter([
         }
         const apiFile = path.join(
           apiDir,
-          `hello.${language === "JavaScript" ? "js" : "ts"}`
+          `hello.${language === "JavaScript" ? "js" : "ts"}`,
         );
         fs.writeFileSync(
           apiFile,
           language === "JavaScript"
             ? `export default function handler(req, res) {\n  res.status(200).json({ message: 'Hello from Next.js API!' });\n}`
-            : `import { NextApiRequest, NextApiResponse } from 'next';\nexport default function handler(req: NextApiRequest, res: NextApiResponse) {\n  res.status(200).json({ message: 'Hello from Next.js API!' });\n}`
+            : `import { NextApiRequest, NextApiResponse } from 'next';\nexport default function handler(req: NextApiRequest, res: NextApiResponse) {\n  res.status(200).json({ message: 'Hello from Next.js API!' });\n}`,
         );
         console.log("Created sample API route.");
       } catch (error) {
@@ -732,8 +732,8 @@ export const router = createBrowserRouter([
           language === "TypeScript"
             ? "tsx"
             : language === "JavaScript"
-            ? "jsx"
-            : "js";
+              ? "jsx"
+              : "js";
         const layoutFile = path.join(baseAppDir, `layout.${ext}`);
         const layoutCode = `import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -797,7 +797,7 @@ export default function RootLayout({
         const mainPageFile = path.join(baseAppDir, `page.${ext}`);
         fs.writeFileSync(
           mainPageFile,
-          `export default function Home() {\n  return (\n    <div>\n      <h1>ESYT</h1>\n    </div>\n  );\n}`
+          `export default function Home() {\n  return (\n    <div>\n      <h1>ESYT</h1>\n    </div>\n  );\n}`,
         );
         console.log(`Overwritten main page as app/page.${ext}`);
       } catch (error) {
@@ -813,16 +813,16 @@ export default function RootLayout({
                 // For Next.js, install tailwindcss, @tailwindcss/postcss, postcss
                 execSync(
                   `${pm.addCmd} tailwindcss @tailwindcss/postcss postcss`,
-                  { stdio: "inherit" }
+                  { stdio: "inherit" },
                 );
                 // Write postcss.config.mjs
                 const postcssConfigPath = path.join(
                   projectPath,
-                  "postcss.config.mjs"
+                  "postcss.config.mjs",
                 );
                 fs.writeFileSync(
                   postcssConfigPath,
-                  'const config = {  plugins: {    "@tailwindcss/postcss": {},  },};\nexport default config;'
+                  'const config = {  plugins: {    "@tailwindcss/postcss": {},  },};\nexport default config;',
                 );
                 // Update globals.css in app or src/app
                 let baseAppDir = projectPath;
@@ -860,7 +860,7 @@ export default function RootLayout({
                 runCommand(`${pm.addCmd} @prisma/client`, { stdio: "inherit" });
                 runCommand(
                   `${pm.dlxCmd} prisma@latest init --datasource-provider postgresql`,
-                  { stdio: "inherit" }
+                  { stdio: "inherit" },
                 );
                 break;
               case "next-auth":
@@ -899,32 +899,6 @@ export default function RootLayout({
     }
     // --- End framework-specific logic ---
 
-    // --- Git init, IDE, dev server, etc. (shared) ---
-    if (gitInit) {
-      try {
-        console.log("\nInitializing Git repository...");
-        runCommand("git init", { stdio: "inherit" });
-        const gitignorePath = path.join(projectPath, ".gitignore");
-        if (!fs.existsSync(gitignorePath)) {
-          fs.writeFileSync(
-            gitignorePath,
-            `# Logs\nlogs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\npnpm-debug.log*\nlerna-debug.log*\n\n# Dependencies\nnode_modules\n*.local\n\n# Editor directories and files\n.vscode/*\n!.vscode/extensions.json\n.idea\n.DS_Store\n*.suo\n*.ntvs*\n*.njsproj\n*.sln\n*.sw?\n\n# Environment variables\n.env\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\n`
-          );
-          console.log("Created .gitignore file.");
-        }
-        console.log("✅ Git repository initialized.");
-      } catch (error) {
-        console.error(
-          `❌ Failed to initialize Git repository: ${error.message}`
-        );
-      }
-    } else {
-      // Remove .git folder if it exists
-      const gitFolder = path.join(projectPath, ".git");
-      if (fs.existsSync(gitFolder)) {
-        fs.rmSync(gitFolder, { recursive: true, force: true });
-      }
-    }
     // Open the project with the selected IDE
     try {
       if (selectedIDE !== "None") {
@@ -954,15 +928,42 @@ export default function RootLayout({
           }
         } catch (error) {
           console.error(
-            `❌ Failed to open project with ${selectedIDE}: ${error.message}`
+            `❌ Failed to open project with ${selectedIDE}: ${error.message}`,
           );
           console.log(
-            `To open manually, run: 'cd ${projectName}' and then the appropriate IDE command.`
+            `To open manually, run: 'cd ${projectName}' and then the appropriate IDE command.`,
           );
         }
       }
     } catch (error) {
       console.error("Error during IDE launch:", error.message);
+    }
+
+    // --- Git init, IDE, dev server, etc. (shared) ---
+    if (gitInit) {
+      try {
+        console.log("\nInitializing Git repository...");
+        runCommand("git init", { stdio: "inherit" });
+        const gitignorePath = path.join(projectPath, ".gitignore");
+        if (!fs.existsSync(gitignorePath)) {
+          fs.writeFileSync(
+            gitignorePath,
+            `# Logs\nlogs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\npnpm-debug.log*\nlerna-debug.log*\n\n# Dependencies\nnode_modules\n*.local\n\n# Editor directories and files\n.vscode/*\n!.vscode/extensions.json\n.idea\n.DS_Store\n*.suo\n*.ntvs*\n*.njsproj\n*.sln\n*.sw?\n\n# Environment variables\n.env\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\n`,
+          );
+          console.log("Created .gitignore file.");
+        }
+        console.log("✅ Git repository initialized.");
+      } catch (error) {
+        console.error(
+          `❌ Failed to initialize Git repository: ${error.message}`,
+        );
+      }
+    } else {
+      // Remove .git folder if it exists
+      const gitFolder = path.join(projectPath, ".git");
+      if (fs.existsSync(gitFolder)) {
+        fs.rmSync(gitFolder, { recursive: true, force: true });
+      }
     }
 
     // Run dev server if selected
@@ -975,10 +976,10 @@ export default function RootLayout({
         runCommand(`${pm.name} run dev`, { stdio: "inherit" });
       } catch (error) {
         console.error(
-          `❌ Failed to start development server: ${error.message}`
+          `❌ Failed to start development server: ${error.message}`,
         );
         console.log(
-          `You can manually start it by running '${pm.name} run dev' in your project directory.`
+          `You can manually start it by running '${pm.name} run dev' in your project directory.`,
         );
       }
     }
@@ -987,7 +988,7 @@ export default function RootLayout({
   } catch (error) {
     console.error(
       "\n❌ An error occurred during project setup:",
-      error.message
+      error.message,
     );
     console.error("Please try again or report this issue.");
     process.exit(1);
