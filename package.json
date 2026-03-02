@@ -1,6 +1,6 @@
 {
   "name": "create-esyt",
-  "version": "14.0.10",
+  "version": "14.1.0",
   "description": "A tool to create a new esyt project with your preferred stack",
   "main": "cli.js",
   "bin": {
@@ -16,6 +16,8 @@
     "react",
     "tailwind",
     "tailwindcss",
+    "tanstack",
+    "tanstack-query",
     "react-router",
     "framer-motion",
     "ogl",

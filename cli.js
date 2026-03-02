@@ -195,6 +195,7 @@ async function run() {
     if (framework === "Vite") {
       packageChoices = [
         "TailwindCSS",
+        "TanStack",
         "React Router",
         "React Icons",
         "Framer Motion",
@@ -209,6 +210,7 @@ async function run() {
     } else if (framework === "Next.js") {
       packageChoices = [
         "TailwindCSS",
+        "TanStack",
         "React Icons",
         "Framer Motion",
         "DotENV",
@@ -226,16 +228,21 @@ async function run() {
     }
     // 4. Package selection. Merge interactive labels with flags.npmPackages.
     let packages = [];
+    const mappedFlagPackages = new Set();
     // Map flag-provided npm packages to the interactive labels when possible.
     if (flags.npmPackages && flags.npmPackages.length > 0) {
       for (const np of flags.npmPackages) {
         const mapped = mapNpmToLabel(np);
-        if (mapped) packages.push(mapped);
+        if (mapped) {
+          packages.push(mapped);
+          mappedFlagPackages.add(np);
+        }
         else {
           // keep the raw npm package name to install later
           packages.push(np);
         }
       }
+      packages = [...new Set(packages)];
     }
 
     // If no packages were provided via flags, prompt interactively (unless --yes)
@@ -507,6 +514,14 @@ export const router = createBrowserRouter([
               runCommand(`${pm.addCmd} react-router-dom`, { stdio: "inherit" });
             } catch (error) {}
           }
+          if (packages.includes("TanStack")) {
+            try {
+              runCommand(
+                `${pm.addCmd} @tanstack/react-query @tanstack/react-query-devtools @tanstack/react-table @tanstack/react-virtual @tanstack/react-form @tanstack/react-hotkeys`,
+                { stdio: "inherit" },
+              );
+            } catch (error) {}
+          }
           if (packages.includes("OGL")) {
             try {
               runCommand(`${pm.addCmd} ogl`, { stdio: "inherit" });
@@ -583,6 +598,7 @@ export const router = createBrowserRouter([
       // Install any arbitrary npm packages provided via flags
       if (flags.npmPackages && flags.npmPackages.length > 0 && installDeps) {
         for (const np of flags.npmPackages) {
+          if (mappedFlagPackages.has(np)) continue;
           try {
             console.log(`Installing extra package: ${np}`);
             runCommand(`${pm.addCmd} ${np}`, { stdio: "inherit" });
@@ -840,6 +856,12 @@ export default function RootLayout({
               case "Framer Motion":
                 runCommand(`${pm.addCmd} framer-motion`, { stdio: "inherit" });
                 break;
+              case "TanStack":
+                runCommand(
+                  `${pm.addCmd} @tanstack/react-query @tanstack/react-query-devtools @tanstack/react-table @tanstack/react-virtual @tanstack/react-form @tanstack/react-hotkeys`,
+                  { stdio: "inherit" },
+                );
+                break;
               case "DotENV":
                 runCommand(`${pm.addCmd} dotenv`, { stdio: "inherit" });
                 break;
@@ -887,6 +909,7 @@ export default function RootLayout({
         // Install any arbitrary npm packages provided via flags
         if (flags.npmPackages && flags.npmPackages.length > 0) {
           for (const np of flags.npmPackages) {
+            if (mappedFlagPackages.has(np)) continue;
             try {
               console.log(`Installing extra package: ${np}`);
               runCommand(`${pm.addCmd} ${np}`, { stdio: "inherit" });
