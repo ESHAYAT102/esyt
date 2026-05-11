@@ -236,8 +236,7 @@ async function run() {
         if (mapped) {
           packages.push(mapped);
           mappedFlagPackages.add(np);
-        }
-        else {
+        } else {
           // keep the raw npm package name to install later
           packages.push(np);
         }
@@ -288,7 +287,7 @@ async function run() {
       }
       if (installDeps === undefined) {
         const result = await p.confirm({
-          message: `Would you like us to run '${pm.installCmd}'?`,
+          message: `Would you like to run '${pm.installCmd}' automatically?`,
           initialValue: true,
         });
         if (p.isCancel(result)) {
