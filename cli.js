@@ -932,7 +932,7 @@ export default function RootLayout({
               ideCommand = "nvim .";
               break;
             case "Zed":
-              ideCommand = "zed .";
+              ideCommand = "zed . || zeditor .";
               break;
             case "VSCode":
               ideCommand = "code .";
